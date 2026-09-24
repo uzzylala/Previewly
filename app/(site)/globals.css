@@ -54,6 +54,7 @@
   /* Spacing: Tailwind's 4px multiplier stays; these name the page rhythm */
   --spacing-gutter: clamp(1.25rem, 4vw, 3rem);
   --spacing-section: clamp(5rem, 10vw, 8rem);
+  --spacing-module: clamp(3.5rem, 7vw, 6rem); /* vertical padding of each content block. Not "block": Tailwind would also read inline-block as inline-size */
 
   --container-page: 76rem;
   --container-measure: 62ch;
@@ -91,6 +92,14 @@
   ::selection {
     background-color: var(--color-proof);
     color: var(--color-paper);
+  }
+
+  /* Reduced motion means no reveal at all: pin revealed elements at their resting state. */
+  @media (prefers-reduced-motion: reduce) {
+    [data-reveal] {
+      opacity: 1 !important;
+      transform: none !important;
+    }
   }
 
   :focus-visible {

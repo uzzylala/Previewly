@@ -1,16 +1,13 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
 
+import { anchorField, eyebrowField } from "../fields";
+
 export const hero = defineType({
   name: "hero",
   title: "Hero",
   type: "object",
   fields: [
-    defineField({
-      name: "eyebrow",
-      description: "Short label above the heading.",
-      type: "string",
-      validation: (rule) => rule.max(40),
-    }),
+    eyebrowField,
     defineField({
       name: "heading",
       type: "string",
@@ -55,6 +52,7 @@ export const hero = defineType({
         }),
       ],
     }),
+    anchorField,
   ],
   preview: {
     select: { title: "heading", media: "image" },

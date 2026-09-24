@@ -15,17 +15,83 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: sanity/extract.json
-export type Link = {
-  _type: "link";
-  label?: string;
-  href?: string;
-};
-
 export type SanityImageAssetReference = {
   _ref: string;
   _type: "reference";
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+};
+
+export type Avatar = {
+  asset?: SanityImageAssetReference;
+  media?: unknown; // Unable to locate the referenced type "avatar.media" in schema
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  _type: "image";
+};
+
+export type RichText = {
+  _type: "richText";
+  eyebrow?: string;
+  body?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "blockquote";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  anchor?: string;
+};
+
+export type Cta = {
+  _type: "cta";
+  heading?: string;
+  body?: string;
+  actions?: Array<
+    {
+      _key: string;
+    } & Link
+  >;
+  anchor?: string;
+};
+
+export type Faq = {
+  _type: "faq";
+  eyebrow?: string;
+  heading?: string;
+  items?: Array<{
+    question?: string;
+    answer?: string;
+    _type: "faqItem";
+    _key: string;
+  }>;
+  anchor?: string;
+};
+
+export type TestimonialGrid = {
+  _type: "testimonialGrid";
+  eyebrow?: string;
+  heading?: string;
+  testimonials?: Array<{
+    quote?: string;
+    name?: string;
+    role?: string;
+    avatar?: Avatar;
+    _type: "testimonial";
+    _key: string;
+  }>;
+  anchor?: string;
 };
 
 export type Hero = {
@@ -47,6 +113,13 @@ export type Hero = {
     alt?: string;
     _type: "image";
   };
+  anchor?: string;
+};
+
+export type Link = {
+  _type: "link";
+  label?: string;
+  href?: string;
 };
 
 export type Page = {
@@ -59,9 +132,21 @@ export type Page = {
   slug?: Slug;
   description?: string;
   blocks?: Array<
-    {
-      _key: string;
-    } & Hero
+    | ({
+        _key: string;
+      } & Hero)
+    | ({
+        _key: string;
+      } & TestimonialGrid)
+    | ({
+        _key: string;
+      } & Faq)
+    | ({
+        _key: string;
+      } & Cta)
+    | ({
+        _key: string;
+      } & RichText)
   >;
 };
 
@@ -185,9 +270,14 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
-  | Link
   | SanityImageAssetReference
+  | Avatar
+  | RichText
+  | Cta
+  | Faq
+  | TestimonialGrid
   | Hero
+  | Link
   | Page
   | SanityImageCrop
   | SanityImageHotspot
@@ -203,46 +293,126 @@ export type AllSanitySchemaTypes =
 
 // Source: sanity/lib/queries.ts
 // Variable: PAGE_QUERY
-// Query: *[_type == "page" && slug.current == $slug][0]{    _id,    title,    description,    blocks[]{      _key,      _type,      _type == "hero" => {        eyebrow,        heading,        emphasis,        body,        actions[]{ _key, label, href },        image{          alt,          crop,          hotspot,          asset->{ _id, url, metadata{ lqip, dimensions{ width, height } } }        }      }    }  }
+// Query: *[_type == "page" && slug.current == $slug][0]{    _id,    title,    description,    blocks[]{      ...,      _type == "hero" => { image {  alt,  crop,  hotspot,  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }} },      _type == "testimonialGrid" => { testimonials[]{ ..., avatar {  alt,  crop,  hotspot,  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }} } }    }  }
 export type PAGE_QUERY_RESULT = {
   _id: string;
   title: string | null;
   description: string | null;
-  blocks: Array<{
-    _key: string;
-    _type: "hero";
-    eyebrow: string | null;
-    heading: string | null;
-    emphasis: string | null;
-    body: string | null;
-    actions: Array<{
-      _key: string;
-      label: string | null;
-      href: string | null;
-    }> | null;
-    image: {
-      alt: string | null;
-      crop: SanityImageCrop | null;
-      hotspot: SanityImageHotspot | null;
-      asset: {
-        _id: string;
-        url: string | null;
-        metadata: {
-          lqip: string | null;
-          dimensions: {
-            width: number | null;
-            height: number | null;
+  blocks: Array<
+    | {
+        _key: string;
+        _type: "cta";
+        heading?: string;
+        body?: string;
+        actions?: Array<
+          {
+            _key: string;
+          } & Link
+        >;
+        anchor?: string;
+      }
+    | {
+        _key: string;
+        _type: "faq";
+        eyebrow?: string;
+        heading?: string;
+        items?: Array<{
+          question?: string;
+          answer?: string;
+          _type: "faqItem";
+          _key: string;
+        }>;
+        anchor?: string;
+      }
+    | {
+        _key: string;
+        _type: "hero";
+        eyebrow?: string;
+        heading?: string;
+        emphasis?: string;
+        body?: string;
+        actions?: Array<
+          {
+            _key: string;
+          } & Link
+        >;
+        image: {
+          alt: string | null;
+          crop: SanityImageCrop | null;
+          hotspot: SanityImageHotspot | null;
+          asset: {
+            _id: string;
+            metadata: {
+              lqip: string | null;
+              dimensions: {
+                width: number | null;
+                height: number | null;
+              } | null;
+            } | null;
           } | null;
         } | null;
-      } | null;
-    } | null;
-  }> | null;
+        anchor?: string;
+      }
+    | {
+        _key: string;
+        _type: "richText";
+        eyebrow?: string;
+        body?: Array<{
+          children?: Array<{
+            marks?: Array<string>;
+            text?: string;
+            _type: "span";
+            _key: string;
+          }>;
+          style?: "blockquote" | "h2" | "h3" | "normal";
+          listItem?: "bullet" | "number";
+          markDefs?: Array<{
+            href?: string;
+            _type: "link";
+            _key: string;
+          }>;
+          level?: number;
+          _type: "block";
+          _key: string;
+        }>;
+        anchor?: string;
+      }
+    | {
+        _key: string;
+        _type: "testimonialGrid";
+        eyebrow?: string;
+        heading?: string;
+        testimonials: Array<{
+          quote?: string;
+          name?: string;
+          role?: string;
+          avatar: {
+            alt: null;
+            crop: SanityImageCrop | null;
+            hotspot: SanityImageHotspot | null;
+            asset: {
+              _id: string;
+              metadata: {
+                lqip: string | null;
+                dimensions: {
+                  width: number | null;
+                  height: number | null;
+                } | null;
+              } | null;
+            } | null;
+          } | null;
+          _type: "testimonial";
+          _key: string;
+        }> | null;
+        anchor?: string;
+      }
+  > | null;
 } | null;
 
 // Query TypeMap
 declare global {
   interface SanityQueries {
-    '\n  *[_type == "page" && slug.current == $slug][0]{\n    _id,\n    title,\n    description,\n    blocks[]{\n      _key,\n      _type,\n      _type == "hero" => {\n        eyebrow,\n        heading,\n        emphasis,\n        body,\n        actions[]{ _key, label, href },\n        image{\n          alt,\n          crop,\n          hotspot,\n          asset->{ _id, url, metadata{ lqip, dimensions{ width, height } } }\n        }\n      }\n    }\n  }\n': PAGE_QUERY_RESULT;
+    '\n  *[_type == "page" && slug.current == $slug][0]{\n    _id,\n    title,\n    description,\n    blocks[]{\n      ...,\n      _type == "hero" => { image {\n  alt,\n  crop,\n  hotspot,\n  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }\n} },\n      _type == "testimonialGrid" => { testimonials[]{ ..., avatar {\n  alt,\n  crop,\n  hotspot,\n  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }\n} } }\n    }\n  }\n': PAGE_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

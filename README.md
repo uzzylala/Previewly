@@ -22,10 +22,19 @@ npm run dev                  # site on :3000, Studio on :3000/studio
 ## How it fits together
 
 - **Content model** (`sanity/schemaTypes`): a `page` document holds an ordered `blocks` array. Each block type is an object schema in `blocks/`.
+- **Block rendering** (`components/blocks/`): `BlockRenderer` looks each block up in `registry.ts`. The registry uses `satisfies` against the TypeGen block union, so a schema block with no component, or with mismatched props, fails the build. Unknown `_type`s render nothing (with a dev warning). Each block is isolated: server-render exceptions are caught per block, and a client error boundary contains runtime failures. Blocks with missing required content either hide or render a reduced version, never broken UI.
 - **Data fetching** (`sanity/lib/fetch.ts`): every read goes through `sanityFetch`, a `'use cache'` function with `cacheLife('max')` and cache tags. Pages are static until an editor publishes; there is no time-based refetching.
 - **Types**: GROQ queries use `defineQuery`, and Sanity TypeGen produces `sanity/types.ts`. Fields stay nullable on purpose: draft content can be half-filled, so components must cope with missing data.
 - **Images** (`components/ui/sanity-image.tsx`): a custom `next/image` loader maps `srcset` widths straight to Sanity CDN transforms. Intrinsic dimensions (post-crop) prevent layout shift, and Sanity's LQIP provides the blur-up placeholder.
 - **Design tokens** (`app/(site)/globals.css`): Tailwind's default palette, radii and type scale are cleared, so only the design system's tokens exist as utilities.
+
+### Adding a block type
+
+1. Add a schema file in `sanity/schemaTypes/blocks/` and list it in `blocks/index.ts`.
+2. Run `npm run typegen`.
+3. Add a component in `components/blocks/` taking `BlockProps<"yourType">`, and add one entry to `registry.ts`.
+
+If the block holds images or references, also add a projection for it in `PAGE_QUERY`. Plain fields are picked up by the `...` spread.
 
 ## Design direction: "Proof"
 

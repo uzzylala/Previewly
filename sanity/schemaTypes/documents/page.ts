@@ -1,5 +1,7 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
 
+import { blockTypes } from "../blocks";
+
 export const page = defineType({
   name: "page",
   title: "Page",
@@ -29,7 +31,7 @@ export const page = defineType({
       name: "blocks",
       description: "The sections of the page, top to bottom.",
       type: "array",
-      of: [defineArrayMember({ type: "hero" })],
+      of: blockTypes.map((block) => defineArrayMember({ type: block.name })),
     }),
   ],
   preview: {

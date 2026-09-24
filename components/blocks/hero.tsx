@@ -1,13 +1,11 @@
 import { ActionLink } from "@/components/ui/action-link";
 import { SanityImage } from "@/components/ui/sanity-image";
 import { Stagger, StaggerItem, StaggerWords } from "@/components/ui/stagger";
-import type { PAGE_QUERY_RESULT } from "@/sanity/types";
 
-type Block = NonNullable<NonNullable<PAGE_QUERY_RESULT>["blocks"]>[number];
-export type HeroBlock = Extract<Block, { _type: "hero" }>;
+import type { BlockProps } from "./types";
 
 /** Splits the heading around the first occurrence of the emphasised words, if present. */
-function headingSegments(heading: string, emphasis: string | null) {
+function headingSegments(heading: string, emphasis: string | undefined) {
   const at = emphasis ? heading.indexOf(emphasis) : -1;
   if (!emphasis || at === -1) return [{ text: heading }];
   return [
@@ -17,7 +15,7 @@ function headingSegments(heading: string, emphasis: string | null) {
   ].filter((segment) => segment.text.length > 0);
 }
 
-export function Hero({ eyebrow, heading, emphasis, body, actions, image }: HeroBlock) {
+export function Hero({ eyebrow, heading, emphasis, body, actions, image }: BlockProps<"hero">) {
   // Drop half-filled actions (e.g. a label typed before the URL) rather than render dead links.
   const links = (actions ?? []).filter(
     (action): action is typeof action & { label: string; href: string } =>
@@ -25,6 +23,7 @@ export function Hero({ eyebrow, heading, emphasis, body, actions, image }: HeroB
   );
   const hasImage = Boolean(image?.asset);
 
+  // Hides itself only when empty; without an image it renders a reduced, text-only layout.
   if (!heading && !body && !hasImage) return null;
 
   return (

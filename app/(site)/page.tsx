@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { Hero } from "@/components/blocks/hero";
+import { BlockRenderer } from "@/components/blocks/block-renderer";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { PAGE_QUERY } from "@/sanity/lib/queries";
 
@@ -27,16 +27,5 @@ export default async function HomePage() {
   const page = await getHomePage();
   if (!page) notFound();
 
-  return (
-    <>
-      {page.blocks?.map((block) => {
-        switch (block._type) {
-          case "hero":
-            return <Hero key={block._key} {...block} />;
-          default:
-            return null;
-        }
-      })}
-    </>
-  );
+  return <BlockRenderer blocks={page.blocks} />;
 }

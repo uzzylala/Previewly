@@ -32,7 +32,7 @@ export function Stagger({ children, className }: Props) {
 
 export function StaggerItem({ children, className }: Props) {
   return (
-    <motion.div className={className} variants={item}>
+    <motion.div data-reveal="" className={className} variants={item}>
       {children}
     </motion.div>
   );
@@ -65,6 +65,7 @@ export function StaggerWords({ segments, className, emClassName }: WordsProps) {
             ) : (
               <motion.span
                 key={`${s}-${t}`}
+                data-reveal=""
                 variants={word}
                 className={`inline-block ${segment.em ? (emClassName ?? "") : ""}`}
               >
