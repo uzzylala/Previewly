@@ -1,4 +1,5 @@
 import { defineEnableDraftMode } from "next-sanity/draft-mode";
+import { unstable_rethrow as rethrow } from "next/navigation";
 import type { NextRequest } from "next/server";
 
 import { safeRedirectPath } from "@/lib/safe-redirect";
@@ -29,6 +30,11 @@ export async function GET(request: NextRequest) {
   try {
     return await enableDraftMode(new Request(url, request));
   } catch (error) {
+    // On success this handler calls next/navigation's redirect(), which signals Next.js
+    // by throwing -- rethrow that untouched so the redirect actually happens, and only
+    // treat anything else as a real failure.
+    rethrow(error);
+
     // next-sanity/preview-url-secret only catches its own URL-parsing errors; a Sanity
     // API failure while checking the secret (wrong/expired token, project unreachable)
     // propagates as an uncaught rejection and would otherwise surface as a bare 500.
