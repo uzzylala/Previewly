@@ -14,9 +14,11 @@ const newsreader = Newsreader({
   axes: ["opsz"],
 });
 
+// Italic is loaded so body-copy <em> gets a true italic rather than a synthesised slant.
 const instrumentSans = Instrument_Sans({
   variable: "--font-instrument-sans",
   subsets: ["latin"],
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {

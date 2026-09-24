@@ -15,8 +15,8 @@
   --color-ink: #131a2b; /* primary text, primary buttons */
   --color-ink-soft: #4a5163; /* secondary text (7.4:1 on paper) */
   --color-proof: #2447c9; /* the single accent: links, emphasis (6.5:1 on paper) */
-  --color-rule: #c9ccc0; /* hairlines and dividers */
-  --color-mark: #d8452b; /* proofreader's red: reserved for draft/preview state */
+  --color-rule: #c9ccc0; /* decorative hairlines only: 1.45:1, never for text or control borders */
+  --color-mark: #b8341e; /* proofreader's red, reserved for draft state (5.3:1 on paper, AA at any size) */
 
   /* Type */
   --font-*: initial;
@@ -97,6 +97,16 @@
     outline: 2px solid var(--color-proof);
     outline-offset: 3px;
   }
+}
+
+/*
+ * The italic serif emphasis. Its hairlines are part of the look but thin out quickly,
+ * so it is only for display type: font-display at text-2xl (25px) or larger. Emphasis
+ * inside body copy uses a plain <em>, which renders in Instrument Sans' own italic.
+ */
+@utility display-emphasis {
+  font-style: italic;
+  color: var(--color-proof);
 }
 
 @layer components {

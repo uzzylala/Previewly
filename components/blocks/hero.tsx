@@ -42,7 +42,7 @@ export function Hero({ eyebrow, heading, emphasis, body, actions, image }: HeroB
             <StaggerWords
               segments={headingSegments(heading, emphasis)}
               className="max-w-[16ch] font-display text-display font-normal"
-              emClassName="italic text-proof"
+              emClassName="display-emphasis"
             />
           )}
           {body && (

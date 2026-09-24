@@ -1,0 +1,149 @@
+<!doctype html>
+<!--
+  Source for scripts/assets/hero-proof.png: a stack of page proofs in the site's own
+  design language. Rendered at 2x (1000x1250 CSS px -> 2000x2500) with Playwright:
+  screenshot of #canvas after document.fonts.ready.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Naskh+Arabic:wght@400;600&family=IBM+Plex+Sans+Arabic:wght@400&display=block">
+<style>
+  :root {
+    --paper: #f1f2ec; --sheet: #fafaf6; --deep: #e7e8e0;
+    --ink: #131a2b; --soft: #4a5163; --proof: #2447c9; --rule: #c9ccc0; --mark: #b8341e;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--paper); }
+  #canvas {
+    width: 1000px; height: 1250px; position: relative; overflow: hidden;
+    background:
+      radial-gradient(120% 90% at 22% 12%, #f4f5ef 0%, #e6e7de 58%, #dcddd3 100%);
+    font-family: "Instrument Sans", sans-serif; color: var(--ink);
+  }
+  .sheet {
+    position: absolute; background: var(--sheet);
+    box-shadow:
+      0 1px 0 rgba(19,26,43,.04),
+      0 2px 6px rgba(19,26,43,.06),
+      0 24px 60px -18px rgba(19,26,43,.28);
+  }
+
+  /* ---- back sheet: Arabic translation ---- */
+  .ar { width: 620px; height: 840px; left: 318px; top: 96px; transform: rotate(4.5deg); padding: 56px 52px; direction: rtl; }
+  .ar .meta { display: flex; justify-content: space-between; font: 400 15px/1 "IBM Plex Sans Arabic", sans-serif; color: var(--soft); border-bottom: 1px solid var(--rule); padding-bottom: 18px; }
+  .ar .meta b { font-weight: 400; color: var(--proof); }
+  .ar h2 { font: 600 50px/1.45 "Noto Naskh Arabic", serif; margin-top: 64px; }
+  .ar p { font: 400 19px/1.9 "IBM Plex Sans Arabic", sans-serif; color: var(--soft); margin-top: 22px; }
+  .ar .lines { margin-top: 44px; display: grid; gap: 16px; }
+  .ar .lines i { display: block; height: 8px; background: var(--deep); border-radius: 1px; }
+
+  /* ---- front sheet: the homepage proof ---- */
+  .en { width: 690px; height: 930px; left: 92px; top: 228px; transform: rotate(-2.2deg); padding: 0 56px; }
+  .nav { display: flex; justify-content: space-between; align-items: center; height: 72px; border-bottom: 1px solid var(--rule); }
+  .logo { font: 400 25px/1 "Newsreader", serif; letter-spacing: -.01em; }
+  .logo em { color: var(--proof); }
+  .links { display: flex; gap: 22px; font-size: 14px; color: var(--soft); }
+  .kicker { margin-top: 56px; font: 500 12px/1 "Instrument Sans"; letter-spacing: .12em; text-transform: uppercase; color: var(--proof); }
+  .en h1 { position: relative; margin-top: 20px; font: 400 60px/1.02 "Newsreader", serif; letter-spacing: -.028em; max-width: 14ch; }
+  .en h1 em { color: var(--proof); position: relative; }
+  .body { position: relative; margin-top: 26px; font-size: 16.5px; line-height: 1.62; color: var(--soft); max-width: 44ch; }
+  .strike { position: relative; }
+  .strike::after { content: ""; position: absolute; left: -2px; right: -2px; top: 54%; height: 1.6px; background: var(--mark); transform: rotate(-4deg); }
+  .insert { position: absolute; font: italic 400 19px/1 "Newsreader", serif; color: var(--mark); white-space: nowrap; }
+  .caret { position: absolute; width: 14px; height: 12px; background: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 14 12%27%3E%3Cpath d=%27M1 11 7 1l6 10%27 fill=%27none%27 stroke=%27%23b8341e%27 stroke-width=%271.6%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E") no-repeat; }
+  .actions { display: flex; gap: 26px; align-items: center; margin-top: 32px; }
+  .btn { background: var(--ink); color: var(--paper); padding: 13px 20px; font-weight: 500; font-size: 15px; border-radius: 2px; }
+  .link { font-weight: 500; font-size: 15px; text-decoration: underline; text-underline-offset: 6px; }
+
+  .figure { position: relative; margin-top: 44px; height: 250px; background: var(--proof); overflow: hidden; }
+  .figure .grid { position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(241,242,236,.16) 1px, transparent 1px), linear-gradient(90deg, rgba(241,242,236,.16) 1px, transparent 1px);
+    background-size: 36px 36px; }
+  .figure .disc { position: absolute; width: 330px; height: 330px; border-radius: 50%; background: var(--ink); right: -60px; bottom: -190px; }
+  .figure .ring { position: absolute; width: 330px; height: 330px; border-radius: 50%; border: 1.5px solid var(--paper); right: 60px; bottom: -150px; }
+  .figure .ring.sm { width: 150px; height: 150px; right: auto; bottom: auto; left: 64px; top: 48px; border-color: rgba(241,242,236,.55); }
+
+  /* proof marks */
+  .circle { position: absolute; border: 1.6px solid var(--mark); border-radius: 50%; transform: rotate(-5deg); }
+  .leader { position: absolute; height: 1.4px; background: var(--mark); transform-origin: left center; }
+  .note { position: absolute; font: italic 400 22px/1.1 "Newsreader", serif; color: var(--mark); white-space: nowrap; }
+  .stamp {
+    position: absolute; right: 52px; bottom: 64px; transform: rotate(-6deg);
+    border: 2px solid var(--mark); color: var(--mark); padding: 10px 14px 9px; text-align: center;
+    font: 600 12px/1.35 "Instrument Sans"; letter-spacing: .16em; text-transform: uppercase;
+  }
+  .stamp small { display: block; font: 400 11px/1.4 "Instrument Sans"; letter-spacing: .06em; text-transform: none; }
+
+  /* printer's marks on the front sheet */
+  .crop { position: absolute; width: 18px; height: 18px; }
+  .crop::before, .crop::after { content: ""; position: absolute; background: var(--soft); }
+  .crop::before { width: 18px; height: 1px; top: 0; }
+  .crop::after { width: 1px; height: 18px; left: 0; }
+  .crop.tl { left: 18px; top: 18px; }
+  .crop.tr { right: 18px; top: 18px; transform: scaleX(-1); }
+  .crop.bl { left: 18px; bottom: 18px; transform: scaleY(-1); }
+  .crop.br { right: 18px; bottom: 18px; transform: scale(-1); }
+  .reg { position: absolute; left: 50%; bottom: 22px; width: 18px; height: 18px; margin-left: -9px; border: 1px solid var(--soft); border-radius: 50%; }
+  .reg::before, .reg::after { content: ""; position: absolute; background: var(--soft); }
+  .reg::before { left: -6px; right: -6px; top: 8px; height: 1px; }
+  .reg::after { top: -6px; bottom: -6px; left: 8px; width: 1px; }
+  .slug { position: absolute; left: 56px; bottom: 20px; font: 400 11px/1 "Instrument Sans"; letter-spacing: .06em; color: var(--soft); }
+</style>
+</head>
+<body>
+<div id="canvas">
+  <div class="sheet ar">
+    <div class="meta"><span>الصفحة الرئيسية · <b>العربية</b></span><span>مسودة ١٤</span></div>
+    <h2>شاهد صفحتك قبل أن يراها العالم.</h2>
+    <p>يكتب المحررون في نظام إدارة المحتوى ويراجعون المسودة بتصميم الموقع الحقيقي، بخطوطه وصوره، قبل نشر أي شيء.</p>
+    <div class="lines"><i></i><i style="width:88%"></i><i style="width:94%"></i><i style="width:62%"></i></div>
+  </div>
+
+  <div class="sheet en">
+    <span class="crop tl"></span><span class="crop tr"></span><span class="crop bl"></span><span class="crop br"></span>
+    <div class="nav"><span class="logo">Preview<em>ly</em></span><span class="links"><span>Product</span><span>Blog</span><span>Pricing</span></span></div>
+    <div class="kicker">Content preview</div>
+    <h1>See the page <em id="before">before</em> the world does.</h1>
+    <p class="body">Editors write in the CMS and <span class="strike" id="check">check</span> their draft in the real site design, fonts, images and all, before anything goes live.</p>
+    <div class="actions"><span class="btn">Start a draft</span><span class="link">How previews work</span></div>
+    <div class="figure"><span class="grid"></span><span class="disc"></span><span class="ring"></span><span class="ring sm"></span></div>
+
+    <!-- proof marks: placed by the script below from the real word positions -->
+    <span class="circle" id="m-circle"></span>
+    <span class="leader" id="m-leader"></span>
+    <span class="note" id="m-note">ital.</span>
+    <span class="caret" id="m-caret"></span>
+    <span class="insert" id="m-insert">read</span>
+    <span class="stamp">Draft · not published<small>rev. 14 · 24 Sep</small></span>
+
+    <span class="reg"></span>
+    <span class="slug">previewly.com / home · en</span>
+  </div>
+</div>
+<script>
+  // Offsets relative to the front sheet (which is rotated as a whole, so marks rotate with it).
+  function within(el, sheet) {
+    let x = 0, y = 0;
+    for (let n = el; n && n !== sheet; n = n.offsetParent) { x += n.offsetLeft; y += n.offsetTop; }
+    return { x, y, w: el.offsetWidth, h: el.offsetHeight };
+  }
+  function place(id, css) { Object.assign(document.getElementById(id).style, css); }
+  document.fonts.ready.then(() => {
+    const sheet = document.querySelector(".en");
+    const w = within(document.getElementById("before"), sheet);
+    const cx = { left: w.x - 16, top: w.y + 4, width: w.w + 30, height: w.h + 4 };
+    place("m-circle", { left: cx.left + "px", top: cx.top + "px", width: cx.width + "px", height: cx.height + "px" });
+    const sx = cx.left + cx.width - 4, sy = cx.top + cx.height * 0.45;
+    const nx = sheet.offsetWidth - 64, ny = cx.top - 38;
+    const len = Math.hypot(nx - sx, ny - sy), ang = Math.atan2(ny - sy, nx - sx) * 180 / Math.PI;
+    place("m-leader", { left: sx + "px", top: sy + "px", width: len - 6 + "px", transform: "rotate(" + ang + "deg)" });
+    place("m-note", { left: nx - 2 + "px", top: ny - 20 + "px" });
+    const c = within(document.getElementById("check"), sheet);
+    place("m-caret", { left: c.x + c.w / 2 - 7 + "px", top: c.y - 12 + "px" });
+    place("m-insert", { left: c.x + c.w / 2 - 16 + "px", top: c.y - 34 + "px" });
+    document.body.dataset.ready = "1";
+  });
+</script>
+</body>
+</html>

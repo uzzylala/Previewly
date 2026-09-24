@@ -34,7 +34,7 @@ async function uploadImage(file: string) {
 }
 
 async function main() {
-  const heroImage = await uploadImage("hero-drafting.jpg");
+  const heroImage = await uploadImage("hero-proof.png");
 
   await client.createOrReplace({
     _id: "page-home",
@@ -57,7 +57,7 @@ async function main() {
         ],
         image: {
           ...heroImage,
-          alt: "A laptop beside an open notebook of hand-drawn page wireframes.",
+          alt: "Two page proofs on a desk: the Previewly homepage marked up in red ink with a Draft stamp, and its Arabic translation behind it.",
         },
       },
     ],
