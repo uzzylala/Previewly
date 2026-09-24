@@ -26,5 +26,22 @@ export async function GET(request: NextRequest) {
     url.searchParams.set(PATHNAME_PARAM, safeRedirectPath(requested, url.origin));
   }
 
-  return enableDraftMode(new Request(url, request));
+  try {
+    return await enableDraftMode(new Request(url, request));
+  } catch (error) {
+    // next-sanity/preview-url-secret only catches its own URL-parsing errors; a Sanity
+    // API failure while checking the secret (wrong/expired token, project unreachable)
+    // propagates as an uncaught rejection and would otherwise surface as a bare 500.
+    // Never log the token itself -- only whether one is configured, and its length.
+    const token = process.env.SANITY_API_READ_TOKEN;
+    console.error("[draft-mode/enable] Failed to validate the preview secret against Sanity.", {
+      tokenConfigured: Boolean(token),
+      tokenLength: token?.length ?? 0,
+      error,
+    });
+    return Response.json(
+      { message: "Could not validate the preview link. Check SANITY_API_READ_TOKEN." },
+      { status: 500 },
+    );
+  }
 }
