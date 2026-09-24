@@ -2,10 +2,16 @@ import { defineArrayMember, defineField, defineType } from "sanity";
 
 import { blockTypes } from "../blocks";
 
+/** Seeded test page of deliberately invalid content; see scripts/seed.mts. */
+export const FIXTURES_PAGE_ID = "page-fixtures";
+
 export const page = defineType({
   name: "page",
   title: "Page",
   type: "document",
+  // The fixtures page is invalid on purpose, so it can never be published from the
+  // Studio anyway. Read-only makes that explicit instead of a confusing disabled Publish.
+  readOnly: ({ document }) => document?._id.replace(/^drafts\./, "") === FIXTURES_PAGE_ID,
   fields: [
     defineField({
       name: "title",
@@ -26,6 +32,13 @@ export const page = defineType({
       type: "text",
       rows: 2,
       validation: (rule) => rule.max(160),
+    }),
+    defineField({
+      name: "noindex",
+      title: "Hide from search engines",
+      description: "Adds a noindex tag and leaves the page out of the sitemap.",
+      type: "boolean",
+      initialValue: false,
     }),
     defineField({
       name: "blocks",

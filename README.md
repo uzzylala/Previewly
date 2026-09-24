@@ -28,6 +28,27 @@ npm run dev                  # site on :3000, Studio on :3000/studio
 - **Images** (`components/ui/sanity-image.tsx`): a custom `next/image` loader maps `srcset` widths straight to Sanity CDN transforms. Intrinsic dimensions (post-crop) prevent layout shift, and Sanity's LQIP provides the blur-up placeholder.
 - **Design tokens** (`app/(site)/globals.css`): Tailwind's default palette, radii and type scale are cleared, so only the design system's tokens exist as utilities.
 
+### Two layers against malformed content
+
+Each layer covers content the other can't reach.
+
+- **Studio validation stops editors from creating malformed content.** Required fields, length limits and URL rules run in the Studio, and Publish stays disabled until a document is valid.
+- **Frontend fallbacks handle malformed content that bypasses validation.** Validation only runs in the Studio. Content can still arrive broken through:
+  - API writes, such as imports, scripts and the seed, which skip validation entirely.
+  - Schema changes, where a field becomes required after documents already exist without it.
+  - Older documents written under earlier rules.
+  - Unfinished drafts, which previews render before anyone has tried to publish.
+
+  Every block therefore either hides itself or renders a reduced version, and never crashes the page.
+
+The homepage passes validation, so editors can always publish it. The deliberately broken fixtures live on [`/fixtures`](http://localhost:3000/fixtures) instead. That page is marked `noindex`, is left out of the sitemap, and is read-only in the Studio. It keeps every fallback exercised without blocking real editing. To check the dataset the same way the Studio does:
+
+```bash
+SANITY_AUTH_TOKEN=<token> npx sanity documents validate -y
+```
+
+Only `page-fixtures` should report errors.
+
 ### Adding a block type
 
 1. Add a schema file in `sanity/schemaTypes/blocks/` and list it in `blocks/index.ts`.

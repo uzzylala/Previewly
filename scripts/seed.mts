@@ -4,8 +4,10 @@
  *
  *   npm run seed
  *
- * The homepage deliberately includes broken content (marked FIXTURE below) so the
- * block renderer's fallbacks stay visible and testable.
+ * The homepage passes Studio validation, so editors can publish changes to it. The
+ * deliberately broken content lives on a separate noindex page, /fixtures, so the
+ * frontend fallbacks stay exercised. It's written through the API, which skips
+ * Studio validation: exactly how malformed content reaches a real site.
  */
 import { createReadStream } from "node:fs";
 import { basename, join } from "node:path";
@@ -81,6 +83,7 @@ async function main() {
     _type: "page",
     title: "Previewly",
     slug: { _type: "slug", current: "home" },
+    noindex: false,
     description:
       "Editors write in the CMS and read their draft in the real site design before anything goes live.",
     blocks: [
@@ -159,27 +162,7 @@ async function main() {
             name: "Ines Albrecht",
             role: "Design Director, Fieldnote",
           },
-          // FIXTURE: no name. Renders the quote without an attribution line.
-          {
-            _key: "t4-no-name",
-            _type: "testimonial",
-            quote: "The draft banner alone saved us from two embarrassing launches.",
-          },
         ],
-      },
-      // FIXTURE (malformed): required testimonials are empty. The block hides itself.
-      {
-        _key: "fixture-empty-testimonials",
-        _type: "testimonialGrid",
-        heading: "More from our customers",
-        testimonials: [],
-      },
-      // FIXTURE (unknown type): not in this build's schema. Skipped, with a dev warning.
-      {
-        _key: "fixture-unknown-type",
-        _type: "pricingTable",
-        heading: "Plans",
-        plans: [{ _key: "p1", name: "Studio", price: 0 }],
       },
       {
         _key: "faq",
@@ -209,8 +192,6 @@ async function main() {
             answer:
               "The block falls back to the default language instead of rendering empty, so a half-translated page never looks broken.",
           },
-          // FIXTURE: question without an answer. This item is dropped; the rest render.
-          { _key: "q4-no-answer", _type: "faqItem", question: "Can I schedule a publish?" },
           {
             _key: "q5",
             _type: "faqItem",
@@ -219,13 +200,6 @@ async function main() {
               "No. Draft and published content go through exactly the same components, which is the whole point.",
           },
         ],
-      },
-      // FIXTURE (malformed): required heading is empty. The block hides itself.
-      {
-        _key: "fixture-cta-no-heading",
-        _type: "cta",
-        heading: "",
-        actions: [link("a", "Orphaned button", "/studio")],
       },
       {
         _key: "cta-main",
@@ -237,7 +211,94 @@ async function main() {
     ],
   });
 
-  console.log("Seeded: page-home");
+  await client.createOrReplace({
+    _id: "page-fixtures",
+    _type: "page",
+    title: "Fixtures",
+    slug: { _type: "slug", current: "fixtures" },
+    description: "Deliberately malformed content for testing frontend fallbacks. Not for editing.",
+    noindex: true,
+    blocks: [
+      // Reduced: no image, so the hero renders its wide text-only layout.
+      {
+        _key: "hero-no-image",
+        _type: "hero",
+        eyebrow: "Test fixtures",
+        heading: "Every block below is broken on purpose.",
+        emphasis: "on purpose",
+        body: "This page is written through the API, which skips Studio validation. Blocks that hide themselves are absent; reduced blocks render what they can.",
+      },
+      // Hidden: an empty hero.
+      { _key: "hero-empty", _type: "hero" },
+      // Reduced: a quote with no name renders without an attribution line.
+      {
+        _key: "testimonials-reduced",
+        _type: "testimonialGrid",
+        eyebrow: "Reduced",
+        heading: "A testimonial with no name",
+        testimonials: [
+          {
+            _key: "valid",
+            _type: "testimonial",
+            quote: "Complete testimonials render normally beside incomplete ones.",
+            name: "Mara Okafor",
+            role: "Head of Content, Tessellate",
+          },
+          {
+            _key: "no-name",
+            _type: "testimonial",
+            quote: "The draft banner alone saved us from two embarrassing launches.",
+          },
+        ],
+      },
+      // Hidden: required testimonials array is empty.
+      {
+        _key: "testimonials-empty",
+        _type: "testimonialGrid",
+        heading: "HIDDEN: empty testimonial grid",
+        testimonials: [],
+      },
+      // Unknown type: not in this build's schema. Skipped, with a dev warning.
+      {
+        _key: "unknown-type",
+        _type: "pricingTable",
+        heading: "HIDDEN: unknown block type",
+        plans: [{ _key: "p1", name: "Studio", price: 0 }],
+      },
+      // Reduced: the question without an answer is dropped; the rest render.
+      {
+        _key: "faq-reduced",
+        _type: "faq",
+        eyebrow: "Reduced",
+        heading: "An FAQ with an unanswered question",
+        items: [
+          {
+            _key: "answered",
+            _type: "faqItem",
+            question: "Does this complete question still render?",
+            answer: "Yes. Only the question with no answer is dropped.",
+          },
+          { _key: "no-answer", _type: "faqItem", question: "HIDDEN: a question with no answer" },
+        ],
+      },
+      // Hidden: required heading is empty.
+      {
+        _key: "cta-no-heading",
+        _type: "cta",
+        heading: "",
+        actions: [link("a", "HIDDEN: orphaned button", "/studio")],
+      },
+      // Hidden: body contains only empty paragraphs (what a cleared editor leaves behind).
+      {
+        _key: "rich-text-empty",
+        _type: "richText",
+        eyebrow: "HIDDEN: empty rich text",
+        body: [block("normal", [""])],
+      },
+    ],
+  });
+
+  console.log("Seeded: page-home, page-fixtures");
 }
 
 main().catch((error) => {

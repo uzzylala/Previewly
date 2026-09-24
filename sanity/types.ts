@@ -131,6 +131,7 @@ export type Page = {
   title?: string;
   slug?: Slug;
   description?: string;
+  noindex?: boolean;
   blocks?: Array<
     | ({
         _key: string;
@@ -293,11 +294,12 @@ export type AllSanitySchemaTypes =
 
 // Source: sanity/lib/queries.ts
 // Variable: PAGE_QUERY
-// Query: *[_type == "page" && slug.current == $slug][0]{    _id,    title,    description,    blocks[]{      ...,      _type == "hero" => { image {  alt,  crop,  hotspot,  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }} },      _type == "testimonialGrid" => { testimonials[]{ ..., avatar {  alt,  crop,  hotspot,  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }} } }    }  }
+// Query: *[_type == "page" && slug.current == $slug][0]{    _id,    title,    description,    noindex,    blocks[]{      ...,      _type == "hero" => { image {  alt,  crop,  hotspot,  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }} },      _type == "testimonialGrid" => { testimonials[]{ ..., avatar {  alt,  crop,  hotspot,  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }} } }    }  }
 export type PAGE_QUERY_RESULT = {
   _id: string;
   title: string | null;
   description: string | null;
+  noindex: boolean | null;
   blocks: Array<
     | {
         _key: string;
@@ -409,10 +411,25 @@ export type PAGE_QUERY_RESULT = {
   > | null;
 } | null;
 
+// Source: sanity/lib/queries.ts
+// Variable: PAGE_SLUGS_QUERY
+// Query: *[_type == "page" && defined(slug.current) && slug.current != "home"].slug.current
+export type PAGE_SLUGS_QUERY_RESULT = Array<string | null>;
+
+// Source: sanity/lib/queries.ts
+// Variable: SITEMAP_QUERY
+// Query: *[_type == "page" && defined(slug.current) && noindex != true]{    "slug": slug.current,    _updatedAt  }
+export type SITEMAP_QUERY_RESULT = Array<{
+  slug: string | null;
+  _updatedAt: string;
+}>;
+
 // Query TypeMap
 declare global {
   interface SanityQueries {
-    '\n  *[_type == "page" && slug.current == $slug][0]{\n    _id,\n    title,\n    description,\n    blocks[]{\n      ...,\n      _type == "hero" => { image {\n  alt,\n  crop,\n  hotspot,\n  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }\n} },\n      _type == "testimonialGrid" => { testimonials[]{ ..., avatar {\n  alt,\n  crop,\n  hotspot,\n  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }\n} } }\n    }\n  }\n': PAGE_QUERY_RESULT;
+    '\n  *[_type == "page" && slug.current == $slug][0]{\n    _id,\n    title,\n    description,\n    noindex,\n    blocks[]{\n      ...,\n      _type == "hero" => { image {\n  alt,\n  crop,\n  hotspot,\n  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }\n} },\n      _type == "testimonialGrid" => { testimonials[]{ ..., avatar {\n  alt,\n  crop,\n  hotspot,\n  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }\n} } }\n    }\n  }\n': PAGE_QUERY_RESULT;
+    '\n  *[_type == "page" && defined(slug.current) && slug.current != "home"].slug.current\n': PAGE_SLUGS_QUERY_RESULT;
+    '\n  *[_type == "page" && defined(slug.current) && noindex != true]{\n    "slug": slug.current,\n    _updatedAt\n  }\n': SITEMAP_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

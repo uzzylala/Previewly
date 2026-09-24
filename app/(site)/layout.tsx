@@ -4,6 +4,7 @@ import { Instrument_Sans, Newsreader } from "next/font/google";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { MotionProvider } from "@/components/ui/motion-provider";
+import { siteUrl } from "@/lib/site";
 
 import "./globals.css";
 
@@ -22,6 +23,7 @@ const instrumentSans = Instrument_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: { default: "Previewly", template: "%s · Previewly" },
   description: "Draft in your CMS, preview in the real site design, publish with confidence.",
 };
