@@ -16,7 +16,7 @@ const newsreader = Newsreader({
   axes: ["opsz"],
 });
 
-// Italic is loaded so body-copy <em> gets a true italic rather than a synthesised slant.
+// Italic is loaded so body-copy <em> gets a true italic rather than a synthesised slant
 const instrumentSans = Instrument_Sans({
   variable: "--font-instrument-sans",
   subsets: ["latin"],
@@ -26,12 +26,16 @@ const instrumentSans = Instrument_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: { default: "Previewly", template: "%s · Previewly" },
-  description: "Draft in your CMS, preview in the real site design, publish with confidence.",
+  description:
+    "Draft in your CMS, preview in the real site design, publish with confidence.",
 };
 
 export default function SiteLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${newsreader.variable} ${instrumentSans.variable}`}>
+    <html
+      lang="en"
+      className={`${newsreader.variable} ${instrumentSans.variable}`}
+    >
       <body className="flex min-h-dvh flex-col">
         <MotionProvider>
           <DraftModePreview />
