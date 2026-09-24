@@ -57,6 +57,14 @@ Only `page-fixtures` should report errors.
 
 If the block holds images or references, also add a projection for it in `PAGE_QUERY`. Plain fields are picked up by the `...` spread.
 
+## Draft preview and revalidation
+
+**Preview:** an editor opens Presentation in the Studio, which mints a one-hour secret tied to their session and loads it through `/api/draft-mode/enable`. That route validates the secret against the dataset server-side, sets Next's signed Draft Mode cookie, and redirects — but only to a same-origin path: the requested path is run through `safeRedirectPath` (`lib/safe-redirect.ts`) before the library ever sees it, so the route can't be turned into an open redirect. In Draft Mode, `sanityFetch` (`sanity/lib/fetch.ts`) switches to a server-only client holding a **Viewer**-role token and bypasses the cache entirely, so edits appear on the next request. A "Viewing a draft" bar (mark red) with an Exit preview control renders from the same production components. Visitors without a valid, unexpired secret always get the published page; a forged or tampered draft cookie is rejected the same way.
+
+**Revalidation:** publishing in the Studio calls a Sanity GROQ webhook to `/api/revalidate`. The route verifies the webhook's HMAC-SHA256 signature (`next-sanity/webhook`'s `parseBody`) before touching anything; an unsigned or wrongly signed request gets 401. A valid publish revalidates only `page:<slug>` for the changed page (and its previous slug, if renamed) plus `page-list` for the sitemap — not the whole site.
+
+**Free plan:** confirmed nothing here needs a paid feature. Draft Mode, the Presentation tool, Visual Editing and GROQ webhooks (2 included) are all on Sanity's Free plan; the Viewer and Administrator token roles used here are too. Only Content Releases/scheduled publishing and private datasets are Growth-only, and this project uses neither.
+
 ## Design direction: "Proof"
 
 The site borrows from the printer's proof, which is what a preview is. It uses cool paper (`#F1F2EC`), ink navy (`#131A2B`) and a single proof-blue accent (`#2447C9`). Proofreader's red (`#B8341E`) is reserved for draft state. Headings are set in Newsreader, body text in Instrument Sans, on a 1.25 type scale. Hairline rules and crop marks stand in for cards and shadows.
