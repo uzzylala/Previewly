@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+/*
+ * Design direction A · "Proof".
+ * Default Tailwind palettes, radii and font sizes are cleared with `initial`, so only
+ * these tokens exist as utilities: an off-palette class simply doesn't compile.
+ */
+@theme {
+  /* Colour */
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-paper: #f1f2ec; /* page ground: cool, slightly green-grey paper */
+  --color-paper-deep: #e7e8e0; /* recessed surfaces, image wells */
+  --color-ink: #131a2b; /* primary text, primary buttons */
+  --color-ink-soft: #4a5163; /* secondary text (7.4:1 on paper) */
+  --color-proof: #2447c9; /* the single accent: links, emphasis (6.5:1 on paper) */
+  --color-rule: #c9ccc0; /* hairlines and dividers */
+  --color-mark: #d8452b; /* proofreader's red: reserved for draft/preview state */
+
+  /* Type */
+  --font-*: initial;
+  --font-display: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
+  --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+
+  /* 1.250 (major third) scale from a 16px base */
+  --text-*: initial;
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.4;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1rem;
+  --text-base--line-height: 1.6;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.6;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.4;
+  --text-2xl: 1.5625rem;
+  --text-2xl--line-height: 1.3;
+  --text-3xl: 1.953rem;
+  --text-3xl--line-height: 1.15;
+  --text-4xl: 2.441rem;
+  --text-4xl--line-height: 1.08;
+  --text-5xl: 3.052rem;
+  --text-5xl--line-height: 1.04;
+  /* Fluid display: 39px on phones up to 76px on wide screens */
+  --text-display: clamp(2.441rem, 1.55rem + 3.8vw, 4.768rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.028em;
+
+  --tracking-label: 0.1em;
+  --tracking-tight: -0.015em;
+
+  /* Spacing: Tailwind's 4px multiplier stays; these name the page rhythm */
+  --spacing-gutter: clamp(1.25rem, 4vw, 3rem);
+  --spacing-section: clamp(5rem, 10vw, 8rem);
+
+  --container-page: 76rem;
+  --container-measure: 62ch;
+
+  /* Print-derived: nearly square corners */
+  --radius-*: initial;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-family: var(--font-sans);
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: var(--color-proof);
+    color: var(--color-paper);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-proof);
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  /* Printer's crop marks at each corner of a framed element. */
+  .crop-marks {
+    --mark-size: 14px;
+    --mark-gap: 8px;
+    position: relative;
+  }
+  .crop-marks::before,
+  .crop-marks::after {
+    content: "";
+    position: absolute;
+    inset: calc(-1 * (var(--mark-gap) + var(--mark-size)));
+    pointer-events: none;
+    --c: var(--color-ink-soft);
+    --s: var(--mark-size);
+  }
+  /* Horizontal ticks */
+  .crop-marks::before {
+    background:
+      linear-gradient(var(--c), var(--c)) top calc(var(--s) + var(--mark-gap)) left 0 / var(--s) 1px,
+      linear-gradient(var(--c), var(--c)) top calc(var(--s) + var(--mark-gap)) right 0 / var(--s) 1px,
+      linear-gradient(var(--c), var(--c)) bottom calc(var(--s) + var(--mark-gap)) left 0 / var(--s) 1px,
+      linear-gradient(var(--c), var(--c)) bottom calc(var(--s) + var(--mark-gap)) right 0 / var(--s) 1px;
+    background-repeat: no-repeat;
+  }
+  /* Vertical ticks */
+  .crop-marks::after {
+    background:
+      linear-gradient(var(--c), var(--c)) left calc(var(--s) + var(--mark-gap)) top 0 / 1px var(--s),
+      linear-gradient(var(--c), var(--c)) right calc(var(--s) + var(--mark-gap)) top 0 / 1px var(--s),
+      linear-gradient(var(--c), var(--c)) left calc(var(--s) + var(--mark-gap)) bottom 0 / 1px var(--s),
+      linear-gradient(var(--c), var(--c)) right calc(var(--s) + var(--mark-gap)) bottom 0 / 1px var(--s);
+    background-repeat: no-repeat;
+  }
+}

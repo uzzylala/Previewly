@@ -6,14 +6,24 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed": "node --env-file=.env.local scripts/seed.mts",
+    "typegen": "node --env-file=.env.local node_modules/sanity/bin/sanity schema extract --path sanity/extract.json --force && node --env-file=.env.local node_modules/sanity/bin/sanity typegen generate",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@sanity/image-url": "^2.1.1",
+    "@sanity/vision": "^6.16.0",
+    "motion": "^13.4.2",
     "next": "16.3.6",
+    "next-sanity": "^13.3.4",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "sanity": "^6.16.0",
+    "styled-components": "^6.5.3"
   },
   "devDependencies": {
+    "@sanity/client": "^7.27.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
