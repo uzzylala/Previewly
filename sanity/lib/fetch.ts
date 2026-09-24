@@ -1,9 +1,11 @@
 import "server-only";
 
 import { cacheLife, cacheTag } from "next/cache";
+import { draftMode } from "next/headers";
 import type { ClientReturn, QueryParams } from "next-sanity";
 
 import { client } from "./client";
+import { draftClient } from "./draft-client";
 
 type FetchOptions<Q extends string> = {
   query: Q;
@@ -13,8 +15,12 @@ type FetchOptions<Q extends string> = {
 };
 
 /**
- * Cached Sanity read. Content only changes when an editor publishes, so results are
- * kept indefinitely and invalidated on demand by tag rather than on a timer.
+ * The single way the site reads Sanity.
+ *
+ * Published content is cached indefinitely and invalidated on demand by tag (see
+ * app/api/revalidate), never on a timer. In Draft Mode, Next.js re-executes this
+ * function on every request and never stores the result, so the draft branch always
+ * reads live, unpublished content and can't leak into the published cache.
  */
 export async function sanityFetch<const Q extends string>({
   query,
@@ -25,5 +31,6 @@ export async function sanityFetch<const Q extends string>({
   cacheLife("max");
   cacheTag(...tags);
 
-  return client.fetch(query, params);
+  const { isEnabled: isDraft } = await draftMode();
+  return (isDraft ? draftClient : client).fetch(query, params);
 }

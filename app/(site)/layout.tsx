@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Instrument_Sans, Newsreader } from "next/font/google";
 
+import { DraftModePreview } from "@/components/preview/draft-mode-preview";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { MotionProvider } from "@/components/ui/motion-provider";
@@ -33,6 +34,7 @@ export default function SiteLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${newsreader.variable} ${instrumentSans.variable}`}>
       <body className="flex min-h-dvh flex-col">
         <MotionProvider>
+          <DraftModePreview />
           <SiteHeader />
           <main className="flex-1">{children}</main>
           <SiteFooter />
