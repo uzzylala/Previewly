@@ -4,12 +4,18 @@ import { VisualEditing, type VisualEditingProps } from "next-sanity/visual-editi
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
-import { exitPreview } from "./actions";
-
 /**
  * The draft indicator. Proofreader's red is reserved for exactly this state, so the bar
- * reads as a correction layer over the real page. Exit is a form posting to a server
- * action rather than a link: links are prefetched, which would leave preview on its own.
+ * reads as a correction layer over the real page.
+ *
+ * Exit posts a plain GET form to the /api/draft-mode/disable route handler rather than
+ * a Server Action. A form (unlike a <Link>) is never prefetched, so preview can't be
+ * left on its own -- but more importantly, it forces a full page load. A Server Action's
+ * redirect() is a *soft*, client-side transition, and when its target is the page the
+ * editor is already on (which it usually is, since Exit returns to the same URL), the
+ * router can serve its cached copy of that page instead of re-fetching -- leaving the
+ * stale draft bar and draft content on screen even though the cookie is already cleared.
+ * A real navigation has no such cache to be stale.
  */
 export function PreviewBar() {
   const pathname = usePathname();
@@ -27,8 +33,8 @@ export function PreviewBar() {
           <span className="font-medium tracking-label uppercase">Viewing a draft</span>
           <span className="hidden text-paper/85 sm:inline">Unpublished changes are visible only in preview.</span>
         </p>
-        <form action={exitPreview}>
-          <input type="hidden" name="returnTo" value={returnTo} />
+        <form method="GET" action="/api/draft-mode/disable">
+          <input type="hidden" name="redirect" value={returnTo} />
           <button
             type="submit"
             className="rounded-xs border border-paper/70 px-3 py-1 font-medium transition-colors duration-200 hover:bg-paper hover:text-mark focus-visible:outline-paper motion-reduce:transition-none"
