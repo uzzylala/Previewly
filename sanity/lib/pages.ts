@@ -156,14 +156,10 @@ export function pageMetadata(result: { page: Page; isFallback: boolean }, locale
   const description = { description: page.description ?? undefined };
 
   if (isFallback) {
-    // Not a translation, so never advertised as one: no hreflang, not indexed, and the
-    // canonical is the real page it is a copy of.
-    return {
-      ...title,
-      ...description,
-      robots: { index: false, follow: true },
-      alternates: { canonical: absoluteUrl(pagePath(defaultLocale, slug)) },
-    };
+    // Not a translation, so never advertised as one: no hreflang and not indexed.
+    // Deliberately no canonical: noindex plus a canonical to another URL sends
+    // contradictory signals (drop this page / consolidate it into that one).
+    return { ...title, ...description, robots: { index: false, follow: true } };
   }
 
   const own = absoluteUrl(pagePath(locale, slug));

@@ -865,6 +865,13 @@
         },
         "optional": true
       },
+      "editorNote": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
       "noindex": {
         "type": "objectAttribute",
         "value": {

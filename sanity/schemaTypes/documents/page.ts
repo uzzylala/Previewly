@@ -44,6 +44,12 @@ export const page = defineType({
       validation: (rule) => rule.max(160),
     }),
     defineField({
+      name: "editorNote",
+      description: "Internal note for editors. Never shown on the site.",
+      type: "text",
+      rows: 2,
+    }),
+    defineField({
       name: "noindex",
       title: "Hide from search engines",
       description: "Adds a noindex tag and leaves the page out of the sitemap.",
@@ -58,9 +64,9 @@ export const page = defineType({
     }),
   ],
   preview: {
-    select: { title: "title", slug: "slug.current", language: "language" },
-    prepare: ({ title, slug, language }) => ({
-      title,
+    select: { title: "title", slug: "slug.current", language: "language", note: "editorNote" },
+    prepare: ({ title, slug, language, note }) => ({
+      title: note?.startsWith("TEST PAGE") ? `⚠ ${title} (test page)` : title,
       subtitle: [
         language ? language.toUpperCase() : "No language",
         slug ? `/${slug === "home" ? "" : slug}` : "No slug",

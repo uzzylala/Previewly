@@ -352,6 +352,8 @@ const pricing = {
   title: "Pricing",
   slug: { _type: "slug", current: "pricing" },
   noindex: false,
+  editorNote:
+    "TEST PAGE: English-only on purpose, to exercise the translation fallback (/fr/pricing and /ar/pricing serve this with a notice). Not real content; do not translate it unless you are testing the fallback redirect.",
   description: "What Previewly costs: nothing, while you prove it out.",
   blocks: [
     {

@@ -57,11 +57,25 @@ Only `page-fixtures` should report errors.
 
 If the block holds images or references, also add a projection for it in `PAGE_QUERY`. Plain fields are picked up by the `...` spread.
 
+## Internationalisation
+
+Live at https://previewly-wheat.vercel.app. Locales: English (default), French, Arabic (RTL).
+
+- **Content model:** one `page` document per language, linked by a `translation.metadata` document (`@sanity/document-internationalization`). Each language publishes independently and can have its own localised slug (`/en/about`, `/fr/a-propos`, `/ar/من-نحن`). Slug uniqueness is per language, so every locale can have a `home`.
+- **Routing:** every URL carries its locale (`/en`, `/fr`, `/ar`). `/` is the only unprefixed URL. `proxy.ts` sends it to the `NEXT_LOCALE` cookie's locale (set by the language switcher), else the best `Accept-Language` match, else English, with a **307**: the destination differs per visitor, so it must never be cached as permanent.
+- **Fallback:** a missing translation serves the default-locale page inside the visitor's own chrome, with a small "not yet translated" notice (otherwise a French visitor gets English copy and can't tell a missing translation from a bug). The English body is wrapped in `lang="en" dir="ltr"`. Fallback pages are `noindex, follow` with **no canonical and no hreflang**. A canonical pointing at the English page would combine "drop this page" (noindex) with "merge it into that one" (canonical), which are contradictory signals; noindex alone is unambiguous, and the fallback is never advertised as a translation.
+- **Fallback redirect:** if `/fr/pricing` is serving English and a French version is later published as `/fr/tarifs`, `/fr/pricing` redirects (307, since the translation can be unpublished) to it.
+- **SEO:** hreflang and `x-default` list only real, published, indexable translations (`x-default` is the English version). The sitemap has one entry per real page with its alternates. URLs are percent-encoded, so Arabic slugs are valid.
+- **RTL:** logical CSS properties only (`ms-`, `ps-`, `border-s`, `text-start`); the arrow icon flips, the wordmark, crop marks and digits do not. Arabic uses Noto Naskh Arabic (display) and IBM Plex Sans Arabic (text), with no letter-spacing and taller leading.
+- **UI strings:** `messages/{en,fr,ar}.json` through next-intl. Dates and numbers use `Intl` via next-intl (UTC), plurals use ICU (Arabic has six forms).
+- **Revalidation:** tags are `page:<locale>:<slug>`. Publishing the French version refreshes only that page. Siblings (their switcher and hreflang) and fallback URLs refresh only when a page's existence changes (first publish, rename, unpublish, noindex flip) or a `translation.metadata` document changes. The Sanity webhook must cover `page` and `translation.metadata`; its projection is documented in `app/api/revalidate/route.ts`.
+- **Test page:** the English-only `pricing` page exists to exercise the fallback. Its Studio note says so; it is not real content.
+
 ## Draft preview and revalidation
 
 **Preview:** an editor opens Presentation in the Studio, which mints a one-hour secret tied to their session and loads it through `/api/draft-mode/enable`. That route validates the secret against the dataset server-side, sets Next's signed Draft Mode cookie, and redirects — but only to a same-origin path: the requested path is run through `safeRedirectPath` (`lib/safe-redirect.ts`) before the library ever sees it, so the route can't be turned into an open redirect. In Draft Mode, `sanityFetch` (`sanity/lib/fetch.ts`) switches to a server-only client holding a **Viewer**-role token and bypasses the cache entirely, so edits appear on the next request. A "Viewing a draft" bar (mark red) with an Exit preview control renders from the same production components. Visitors without a valid, unexpired secret always get the published page; a forged or tampered draft cookie is rejected the same way.
 
-**Revalidation:** publishing in the Studio calls a Sanity GROQ webhook to `/api/revalidate`. The route verifies the webhook's HMAC-SHA256 signature (`next-sanity/webhook`'s `parseBody`) before touching anything; an unsigned or wrongly signed request gets 401. A valid publish revalidates only `page:<slug>` for the changed page (and its previous slug, if renamed) plus `page-list` for the sitemap — not the whole site.
+**Revalidation:** publishing in the Studio calls a Sanity GROQ webhook to `/api/revalidate`. The route verifies the webhook's HMAC-SHA256 signature (`next-sanity/webhook`'s `parseBody`) before touching anything; an unsigned or wrongly signed request gets 401. A valid publish revalidates only `page:<locale>:<slug>` for the changed page (see Internationalisation) plus `page-list` for the sitemap — not the whole site.
 
 **Free plan:** confirmed nothing here needs a paid feature. Draft Mode, the Presentation tool, Visual Editing and GROQ webhooks (2 included) are all on Sanity's Free plan; the Viewer and Administrator token roles used here are too. Only Content Releases/scheduled publishing and private datasets are Growth-only, and this project uses neither.
 

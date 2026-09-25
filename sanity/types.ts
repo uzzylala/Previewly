@@ -161,6 +161,7 @@ export type Page = {
   title?: string;
   slug?: Slug;
   description?: string;
+  editorNote?: string;
   noindex?: boolean;
   blocks?: Array<
     | ({
