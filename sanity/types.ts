@@ -122,12 +122,42 @@ export type Link = {
   href?: string;
 };
 
+export type TranslationMetadata = {
+  _id: string;
+  _type: "translation.metadata";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  translations?: InternationalizedArrayReference;
+  schemaTypes?: Array<string>;
+};
+
+export type InternationalizedArrayReference = Array<
+  {
+    _key: string;
+  } & InternationalizedArrayReferenceValue
+>;
+
+export type PageReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "page";
+};
+
+export type InternationalizedArrayReferenceValue = {
+  _type: "internationalizedArrayReferenceValue";
+  value?: PageReference;
+  language?: string;
+};
+
 export type Page = {
   _id: string;
   _type: "page";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  language?: string;
   title?: string;
   slug?: Slug;
   description?: string;
@@ -279,6 +309,10 @@ export type AllSanitySchemaTypes =
   | TestimonialGrid
   | Hero
   | Link
+  | TranslationMetadata
+  | InternationalizedArrayReference
+  | PageReference
+  | InternationalizedArrayReferenceValue
   | Page
   | SanityImageCrop
   | SanityImageHotspot
@@ -294,12 +328,20 @@ export type AllSanitySchemaTypes =
 
 // Source: sanity/lib/queries.ts
 // Variable: PAGE_QUERY
-// Query: *[_type == "page" && slug.current == $slug][0]{    _id,    title,    description,    noindex,    blocks[]{      ...,      _type == "hero" => { image {  alt,  crop,  hotspot,  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }} },      _type == "testimonialGrid" => { testimonials[]{ ..., avatar {  alt,  crop,  hotspot,  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }} } }    }  }
+// Query: *[_type == "page" && slug.current == $slug && language == $language][0]{    _id,    _updatedAt,    language,    "slug": slug.current,    title,    description,    noindex,    "translations":   *[_type == "translation.metadata" && references(^._id)][0].translations[]{    language,    "slug": value->slug.current,    "noindex": value->noindex  }[defined(slug)],    blocks[]{      ...,      _type == "hero" => { image {  alt,  crop,  hotspot,  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }} },      _type == "testimonialGrid" => { testimonials[]{ ..., avatar {  alt,  crop,  hotspot,  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }} } }    }  }
 export type PAGE_QUERY_RESULT = {
   _id: string;
+  _updatedAt: string;
+  language: string | null;
+  slug: string | null;
   title: string | null;
   description: string | null;
   noindex: boolean | null;
+  translations: Array<{
+    language: string | null;
+    slug: string;
+    noindex: boolean | null;
+  }> | null;
   blocks: Array<
     | {
         _key: string;
@@ -412,24 +454,51 @@ export type PAGE_QUERY_RESULT = {
 } | null;
 
 // Source: sanity/lib/queries.ts
-// Variable: PAGE_SLUGS_QUERY
-// Query: *[_type == "page" && defined(slug.current) && slug.current != "home"].slug.current
-export type PAGE_SLUGS_QUERY_RESULT = Array<string | null>;
+// Variable: PAGE_PARAMS_QUERY
+// Query: *[_type == "page" && defined(slug.current) && defined(language)]{    language,    "slug": slug.current  }
+export type PAGE_PARAMS_QUERY_RESULT = Array<{
+  language: string | null;
+  slug: string | null;
+}>;
 
 // Source: sanity/lib/queries.ts
 // Variable: SITEMAP_QUERY
-// Query: *[_type == "page" && defined(slug.current) && noindex != true]{    "slug": slug.current,    _updatedAt  }
+// Query: *[_type == "page" && defined(slug.current) && defined(language) && noindex != true]{    language,    "slug": slug.current,    _updatedAt,    "translations":   *[_type == "translation.metadata" && references(^._id)][0].translations[]{    language,    "slug": value->slug.current,    "noindex": value->noindex  }[defined(slug)]  }
 export type SITEMAP_QUERY_RESULT = Array<{
+  language: string | null;
   slug: string | null;
   _updatedAt: string;
+  translations: Array<{
+    language: string | null;
+    slug: string;
+    noindex: boolean | null;
+  }> | null;
+}>;
+
+// Source: sanity/lib/queries.ts
+// Variable: SIBLINGS_OF_PAGE_QUERY
+// Query: *[_type == "translation.metadata" && references($id)].translations[]{    language,    "slug": value->slug.current  }
+export type SIBLINGS_OF_PAGE_QUERY_RESULT = Array<{
+  language: string | null;
+  slug: string | null;
+} | null>;
+
+// Source: sanity/lib/queries.ts
+// Variable: PAGES_BY_ID_QUERY
+// Query: *[_type == "page" && _id in $ids]{ language, "slug": slug.current }
+export type PAGES_BY_ID_QUERY_RESULT = Array<{
+  language: string | null;
+  slug: string | null;
 }>;
 
 // Query TypeMap
 declare global {
   interface SanityQueries {
-    '\n  *[_type == "page" && slug.current == $slug][0]{\n    _id,\n    title,\n    description,\n    noindex,\n    blocks[]{\n      ...,\n      _type == "hero" => { image {\n  alt,\n  crop,\n  hotspot,\n  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }\n} },\n      _type == "testimonialGrid" => { testimonials[]{ ..., avatar {\n  alt,\n  crop,\n  hotspot,\n  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }\n} } }\n    }\n  }\n': PAGE_QUERY_RESULT;
-    '\n  *[_type == "page" && defined(slug.current) && slug.current != "home"].slug.current\n': PAGE_SLUGS_QUERY_RESULT;
-    '\n  *[_type == "page" && defined(slug.current) && noindex != true]{\n    "slug": slug.current,\n    _updatedAt\n  }\n': SITEMAP_QUERY_RESULT;
+    '\n  *[_type == "page" && slug.current == $slug && language == $language][0]{\n    _id,\n    _updatedAt,\n    language,\n    "slug": slug.current,\n    title,\n    description,\n    noindex,\n    "translations": \n  *[_type == "translation.metadata" && references(^._id)][0].translations[]{\n    language,\n    "slug": value->slug.current,\n    "noindex": value->noindex\n  }[defined(slug)]\n,\n    blocks[]{\n      ...,\n      _type == "hero" => { image {\n  alt,\n  crop,\n  hotspot,\n  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }\n} },\n      _type == "testimonialGrid" => { testimonials[]{ ..., avatar {\n  alt,\n  crop,\n  hotspot,\n  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }\n} } }\n    }\n  }\n': PAGE_QUERY_RESULT;
+    '\n  *[_type == "page" && defined(slug.current) && defined(language)]{\n    language,\n    "slug": slug.current\n  }\n': PAGE_PARAMS_QUERY_RESULT;
+    '\n  *[_type == "page" && defined(slug.current) && defined(language) && noindex != true]{\n    language,\n    "slug": slug.current,\n    _updatedAt,\n    "translations": \n  *[_type == "translation.metadata" && references(^._id)][0].translations[]{\n    language,\n    "slug": value->slug.current,\n    "noindex": value->noindex\n  }[defined(slug)]\n\n  }\n': SITEMAP_QUERY_RESULT;
+    '\n  *[_type == "translation.metadata" && references($id)].translations[]{\n    language,\n    "slug": value->slug.current\n  }\n': SIBLINGS_OF_PAGE_QUERY_RESULT;
+    '\n  *[_type == "page" && _id in $ids]{ language, "slug": slug.current }\n': PAGES_BY_ID_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

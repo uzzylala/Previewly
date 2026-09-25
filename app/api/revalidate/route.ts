@@ -2,19 +2,58 @@ import { revalidateTag } from "next/cache";
 import { parseBody } from "next-sanity/webhook";
 import type { NextRequest } from "next/server";
 
+import { isLocale, locales } from "@/i18n/locales";
+import { client } from "@/sanity/lib/client";
+import { PAGES_BY_ID_QUERY, SIBLINGS_OF_PAGE_QUERY } from "@/sanity/lib/queries";
 import { cacheTags } from "@/sanity/lib/tags";
 
 /**
- * Shape of the Sanity GROQ webhook projection (configured on the webhook itself):
- *   { _type, "slug": after().slug.current, "previousSlug": before().slug.current }
- * previousSlug lets a renamed page's old URL drop out of the cache too.
+ * Shape of the Sanity GROQ webhook projection (configured on the webhook itself, for
+ * documents of type "page" and "translation.metadata"):
+ *
+ *   {
+ *     _type, _id,
+ *     "language": after().language,         "slug": after().slug.current,
+ *     "noindex": after().noindex,
+ *     "previousLanguage": before().language, "previousSlug": before().slug.current,
+ *     "previousNoindex": before().noindex,
+ *     "translationIds": coalesce(after().translations[].value._ref, []) + coalesce(before().translations[].value._ref, [])
+ *   }
+ *
+ * The before/after pair lets a renamed, moved or deleted page's old URL drop out of the
+ * cache too.
  */
-type WebhookPayload = { _type?: string; slug?: string | null; previousSlug?: string | null };
+type WebhookPayload = {
+  _type?: string;
+  _id?: string;
+  language?: string | null;
+  slug?: string | null;
+  noindex?: boolean | null;
+  previousLanguage?: string | null;
+  previousSlug?: string | null;
+  previousNoindex?: boolean | null;
+  translationIds?: string[] | null;
+};
+
+type Version = { language: string | null; slug: string | null };
+
+/** Adds the tag for one page version, ignoring anything that isn't a real locale/slug. */
+function tagVersion(tags: Set<string>, { language, slug }: Version) {
+  if (slug && language && isLocale(language)) tags.add(cacheTags.page(language, slug));
+}
 
 /**
  * Called by Sanity on publish (create, update, delete). The request must carry a valid
  * HMAC-SHA256 signature over its raw body made with SANITY_REVALIDATE_SECRET; anything
  * else is rejected before any cache is touched.
+ *
+ * Revalidation is per language, so publishing the French page refreshes /fr/<slug> and
+ * nothing else. Pages that merely *depend* on a page's existence (its siblings' language
+ * switcher and hreflang, and fallbacks that show it) are refreshed only when that
+ * existence changes: a first publish, a rename, an unpublish, a noindex flip, or a change
+ * to which translations are linked. A plain content edit touches its own page alone
+ * (fallback renders carry the default-language page's tag, so editing English still
+ * refreshes the pages that show it as a fallback).
  */
 export async function POST(request: NextRequest) {
   const secret = process.env.SANITY_REVALIDATE_SECRET;
@@ -34,10 +73,34 @@ export async function POST(request: NextRequest) {
   }
 
   const tags = new Set<string>();
+
   if (body._type === "page") {
-    for (const slug of [body.slug, body.previousSlug]) {
-      if (slug) tags.add(cacheTags.page(slug));
+    if (!body.language && !body.previousLanguage) {
+      // A webhook still on the pre-i18n projection: we can't tell which language changed,
+      // so refresh the slug in every language rather than serve any of them stale.
+      for (const locale of locales) {
+        for (const slug of [body.slug, body.previousSlug]) tagVersion(tags, { language: locale, slug: slug ?? null });
+      }
+    } else {
+      tagVersion(tags, { language: body.language ?? null, slug: body.slug ?? null });
+      tagVersion(tags, { language: body.previousLanguage ?? null, slug: body.previousSlug ?? null });
+
+      const existenceChanged =
+        (body.language ?? null) !== (body.previousLanguage ?? null) ||
+        (body.slug ?? null) !== (body.previousSlug ?? null) ||
+        (body.noindex === true) !== (body.previousNoindex === true);
+
+      if (existenceChanged && body._id) {
+        const siblings = await client.fetch(SIBLINGS_OF_PAGE_QUERY, { id: body._id });
+        for (const sibling of siblings ?? []) if (sibling) tagVersion(tags, sibling);
+      }
     }
+    tags.add(cacheTags.pageList);
+  } else if (body._type === "translation.metadata") {
+    // Linking or unlinking translations changes every sibling's switcher and hreflang.
+    const ids = body.translationIds ?? [];
+    const versions = ids.length ? await client.fetch(PAGES_BY_ID_QUERY, { ids }) : [];
+    for (const version of versions) tagVersion(tags, version);
     tags.add(cacheTags.pageList);
   }
 
