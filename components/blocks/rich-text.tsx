@@ -10,7 +10,7 @@ import type { BlockProps } from "./types";
  * Logical properties (ps-, border-s) throughout so the same styles mirror correctly in RTL.
  * Emphasis is Instrument Sans' true italic; the italic serif is reserved for display type.
  */
-const components: PortableTextComponents = {
+export const richTextComponents: PortableTextComponents = {
   block: {
     normal: ({ children }) => <p>{children}</p>,
     h2: ({ children }) => (
@@ -73,7 +73,7 @@ export function RichText({ eyebrow, body }: BlockProps<"richText">) {
       <Reveal
         className={`flex max-w-measure flex-col gap-5 text-lg text-ink-soft md:col-span-7 ${eyebrow ? "" : "md:col-start-4"}`}
       >
-        <PortableText value={body} components={components} />
+        <PortableText value={body} components={richTextComponents} />
       </Reveal>
     </section>
   );

@@ -14,6 +14,7 @@ import { basename, join } from "node:path";
 
 import { createClient } from "@sanity/client";
 
+import { blogDocuments } from "./blog-content.mts";
 import { block, link } from "./helpers.mts";
 import { translationDocuments } from "./translations.mts";
 
@@ -272,7 +273,15 @@ async function main() {
   // documents that link each set of versions together.
   for (const doc of translationDocuments(heroImage)) await client.createOrReplace(doc);
 
-  console.log("Seeded: pages in en / fr / ar, translation metadata and page-fixtures");
+  // Blog posts (en / fr / ar, uneven coverage on purpose) and their cover images.
+  const covers = {
+    "cover-1": await uploadImage("cover-1.png"),
+    "cover-2": await uploadImage("cover-2.png"),
+    "cover-3": await uploadImage("cover-3.png"),
+  };
+  for (const doc of blogDocuments(covers)) await client.createOrReplace(doc);
+
+  console.log("Seeded: pages and blog posts in en / fr / ar, translation metadata and page-fixtures");
 }
 
 main().catch((error) => {

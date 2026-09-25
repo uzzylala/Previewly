@@ -145,10 +145,81 @@ export type PageReference = {
   [internalGroqTypeReferenceTo]?: "page";
 };
 
+export type PostReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "post";
+};
+
 export type InternationalizedArrayReferenceValue = {
   _type: "internationalizedArrayReferenceValue";
-  value?: PageReference;
+  value?: PageReference | PostReference;
   language?: string;
+};
+
+export type Post = {
+  _id: string;
+  _type: "post";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  language?: string;
+  title?: string;
+  slug?: Slug;
+  excerpt?: string;
+  coverImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  author?: string;
+  publishedAt?: string;
+  tags?: Array<string>;
+  body?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "blockquote";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  noindex?: boolean;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
+};
+
+export type Slug = {
+  _type: "slug";
+  current?: string;
+  source?: string;
 };
 
 export type Page = {
@@ -180,28 +251,6 @@ export type Page = {
         _key: string;
       } & RichText)
   >;
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
-};
-
-export type Slug = {
-  _type: "slug";
-  current?: string;
-  source?: string;
 };
 
 export type SanityImagePaletteSwatch = {
@@ -313,11 +362,13 @@ export type AllSanitySchemaTypes =
   | TranslationMetadata
   | InternationalizedArrayReference
   | PageReference
+  | PostReference
   | InternationalizedArrayReferenceValue
-  | Page
+  | Post
   | SanityImageCrop
   | SanityImageHotspot
   | Slug
+  | Page
   | SanityImagePaletteSwatch
   | SanityImagePalette
   | SanityImageDimensions
@@ -477,20 +528,133 @@ export type SITEMAP_QUERY_RESULT = Array<{
 }>;
 
 // Source: sanity/lib/queries.ts
-// Variable: SIBLINGS_OF_PAGE_QUERY
-// Query: *[_type == "translation.metadata" && references($id)].translations[]{    language,    "slug": value->slug.current  }
-export type SIBLINGS_OF_PAGE_QUERY_RESULT = Array<{
+// Variable: POST_QUERY
+// Query: *[_type == "post" && slug.current == $slug && language == $language][0]{    _id,    _updatedAt,    language,    "slug": slug.current,    title,    excerpt,    author,    publishedAt,    tags,    noindex,    coverImage {  alt,  crop,  hotspot,  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }},    body,    "translations":   *[_type == "translation.metadata" && references(^._id)][0].translations[]{    language,    "slug": value->slug.current,    "noindex": value->noindex  }[defined(slug)]  }
+export type POST_QUERY_RESULT = {
+  _id: string;
+  _updatedAt: string;
   language: string | null;
+  slug: string | null;
+  title: string | null;
+  excerpt: string | null;
+  author: string | null;
+  publishedAt: string | null;
+  tags: Array<string> | null;
+  noindex: boolean | null;
+  coverImage: {
+    alt: string | null;
+    crop: SanityImageCrop | null;
+    hotspot: SanityImageHotspot | null;
+    asset: {
+      _id: string;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number | null;
+          height: number | null;
+        } | null;
+      } | null;
+    } | null;
+  } | null;
+  body: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h2" | "h3" | "normal";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+  translations: Array<{
+    language: string | null;
+    slug: string;
+    noindex: boolean | null;
+  }> | null;
+} | null;
+
+// Source: sanity/lib/queries.ts
+// Variable: POST_INDEX_QUERY
+// Query: *[_type == "post" && language == $language && defined(slug.current) && noindex != true]    | order(publishedAt desc){    _id,    "slug": slug.current,    title,    excerpt,    author,    publishedAt,    tags,    coverImage {  alt,  crop,  hotspot,  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }}  }
+export type POST_INDEX_QUERY_RESULT = Array<{
+  _id: string;
+  slug: string | null;
+  title: string | null;
+  excerpt: string | null;
+  author: string | null;
+  publishedAt: string | null;
+  tags: Array<string> | null;
+  coverImage: {
+    alt: string | null;
+    crop: SanityImageCrop | null;
+    hotspot: SanityImageHotspot | null;
+    asset: {
+      _id: string;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number | null;
+          height: number | null;
+        } | null;
+      } | null;
+    } | null;
+  } | null;
+}>;
+
+// Source: sanity/lib/queries.ts
+// Variable: POST_PARAMS_QUERY
+// Query: *[_type == "post" && defined(slug.current) && defined(language)]{    language,    "slug": slug.current  }
+export type POST_PARAMS_QUERY_RESULT = Array<{
+  language: string | null;
+  slug: string | null;
+}>;
+
+// Source: sanity/lib/queries.ts
+// Variable: SITEMAP_POSTS_QUERY
+// Query: *[_type == "post" && defined(slug.current) && defined(language) && noindex != true]{    language,    "slug": slug.current,    _updatedAt,    "translations":   *[_type == "translation.metadata" && references(^._id)][0].translations[]{    language,    "slug": value->slug.current,    "noindex": value->noindex  }[defined(slug)]  }
+export type SITEMAP_POSTS_QUERY_RESULT = Array<{
+  language: string | null;
+  slug: string | null;
+  _updatedAt: string;
+  translations: Array<{
+    language: string | null;
+    slug: string;
+    noindex: boolean | null;
+  }> | null;
+}>;
+
+// Source: sanity/lib/queries.ts
+// Variable: SIBLINGS_OF_DOC_QUERY
+// Query: *[_type == "translation.metadata" && references($id)].translations[]{    language,    "type": value->_type,    "slug": value->slug.current  }
+export type SIBLINGS_OF_DOC_QUERY_RESULT = Array<{
+  language: string | null;
+  type: "page" | "post" | null;
   slug: string | null;
 } | null>;
 
 // Source: sanity/lib/queries.ts
-// Variable: PAGES_BY_ID_QUERY
-// Query: *[_type == "page" && _id in $ids]{ language, "slug": slug.current }
-export type PAGES_BY_ID_QUERY_RESULT = Array<{
-  language: string | null;
-  slug: string | null;
-}>;
+// Variable: DOCS_BY_ID_QUERY
+// Query: *[_type in ["page", "post"] && _id in $ids]{ _type, language, "slug": slug.current }
+export type DOCS_BY_ID_QUERY_RESULT = Array<
+  | {
+      _type: "page";
+      language: string | null;
+      slug: string | null;
+    }
+  | {
+      _type: "post";
+      language: string | null;
+      slug: string | null;
+    }
+>;
 
 // Query TypeMap
 declare global {
@@ -498,8 +662,12 @@ declare global {
     '\n  *[_type == "page" && slug.current == $slug && language == $language][0]{\n    _id,\n    _updatedAt,\n    language,\n    "slug": slug.current,\n    title,\n    description,\n    noindex,\n    "translations": \n  *[_type == "translation.metadata" && references(^._id)][0].translations[]{\n    language,\n    "slug": value->slug.current,\n    "noindex": value->noindex\n  }[defined(slug)]\n,\n    blocks[]{\n      ...,\n      _type == "hero" => { image {\n  alt,\n  crop,\n  hotspot,\n  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }\n} },\n      _type == "testimonialGrid" => { testimonials[]{ ..., avatar {\n  alt,\n  crop,\n  hotspot,\n  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }\n} } }\n    }\n  }\n': PAGE_QUERY_RESULT;
     '\n  *[_type == "page" && defined(slug.current) && defined(language)]{\n    language,\n    "slug": slug.current\n  }\n': PAGE_PARAMS_QUERY_RESULT;
     '\n  *[_type == "page" && defined(slug.current) && defined(language) && noindex != true]{\n    language,\n    "slug": slug.current,\n    _updatedAt,\n    "translations": \n  *[_type == "translation.metadata" && references(^._id)][0].translations[]{\n    language,\n    "slug": value->slug.current,\n    "noindex": value->noindex\n  }[defined(slug)]\n\n  }\n': SITEMAP_QUERY_RESULT;
-    '\n  *[_type == "translation.metadata" && references($id)].translations[]{\n    language,\n    "slug": value->slug.current\n  }\n': SIBLINGS_OF_PAGE_QUERY_RESULT;
-    '\n  *[_type == "page" && _id in $ids]{ language, "slug": slug.current }\n': PAGES_BY_ID_QUERY_RESULT;
+    '\n  *[_type == "post" && slug.current == $slug && language == $language][0]{\n    _id,\n    _updatedAt,\n    language,\n    "slug": slug.current,\n    title,\n    excerpt,\n    author,\n    publishedAt,\n    tags,\n    noindex,\n    coverImage {\n  alt,\n  crop,\n  hotspot,\n  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }\n},\n    body,\n    "translations": \n  *[_type == "translation.metadata" && references(^._id)][0].translations[]{\n    language,\n    "slug": value->slug.current,\n    "noindex": value->noindex\n  }[defined(slug)]\n\n  }\n': POST_QUERY_RESULT;
+    '\n  *[_type == "post" && language == $language && defined(slug.current) && noindex != true]\n    | order(publishedAt desc){\n    _id,\n    "slug": slug.current,\n    title,\n    excerpt,\n    author,\n    publishedAt,\n    tags,\n    coverImage {\n  alt,\n  crop,\n  hotspot,\n  asset->{ _id, metadata{ lqip, dimensions{ width, height } } }\n}\n  }\n': POST_INDEX_QUERY_RESULT;
+    '\n  *[_type == "post" && defined(slug.current) && defined(language)]{\n    language,\n    "slug": slug.current\n  }\n': POST_PARAMS_QUERY_RESULT;
+    '\n  *[_type == "post" && defined(slug.current) && defined(language) && noindex != true]{\n    language,\n    "slug": slug.current,\n    _updatedAt,\n    "translations": \n  *[_type == "translation.metadata" && references(^._id)][0].translations[]{\n    language,\n    "slug": value->slug.current,\n    "noindex": value->noindex\n  }[defined(slug)]\n\n  }\n': SITEMAP_POSTS_QUERY_RESULT;
+    '\n  *[_type == "translation.metadata" && references($id)].translations[]{\n    language,\n    "type": value->_type,\n    "slug": value->slug.current\n  }\n': SIBLINGS_OF_DOC_QUERY_RESULT;
+    '\n  *[_type in ["page", "post"] && _id in $ids]{ _type, language, "slug": slug.current }\n': DOCS_BY_ID_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

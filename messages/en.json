@@ -8,7 +8,8 @@
   },
   "Nav": {
     "howItWorks": "How it works",
-    "faq": "FAQ"
+    "faq": "FAQ",
+    "blog": "Blog"
   },
   "Language": {
     "label": "Language",
@@ -45,5 +46,26 @@
     "title": "Page not found",
     "body": "This page doesn't exist, or it hasn't been published yet.",
     "home": "Back to the homepage"
+  },
+  "Blog": {
+    "eyebrow": "Blog",
+    "title": "Blog",
+    "description": "Notes on previews, localization and publishing without surprises.",
+    "loading": "Loading posts…",
+    "searchLabel": "Search posts",
+    "searchPlaceholder": "Title, topic or author",
+    "search": "Search",
+    "tagsLabel": "Filter by tag",
+    "allTags": "All",
+    "results": "{count, plural, one {# post} other {# posts}}",
+    "noResults": "No posts match your search.",
+    "noPosts": "No posts in this language yet.",
+    "pagination": "Pagination",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page}",
+    "by": "By {author}",
+    "published": "Published",
+    "back": "All posts"
   }
 }

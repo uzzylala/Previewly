@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { getFormatter, getTranslations } from "next-intl/server";
 
 import { defaultLocale, localeMeta, type Locale } from "@/i18n/locales";
-import { pagePath } from "@/lib/urls";
+import { pagePath, unprefixedPath } from "@/lib/urls";
 import { getLocalizedPage, localeLinks, pageMetadata } from "@/sanity/lib/pages";
 
 import { BlockRenderer } from "./blocks/block-renderer";
@@ -30,7 +30,7 @@ export async function LocalizedPage({ locale, slug }: { locale: Locale; slug: st
   return (
     <PageShell
       languages={localeLinks(page, locale)}
-      notice={isFallback ? <FallbackNotice locale={locale} slug={page.slug ?? slug} /> : undefined}
+      notice={isFallback ? <FallbackNotice locale={locale} path={unprefixedPath(page.slug ?? slug)} /> : undefined}
     >
       {/* The body of a fallback is in the default language, whatever the page around it is. */}
       <div {...(isFallback ? { lang: defaultLocale, dir: localeMeta[defaultLocale].dir } : {})}>

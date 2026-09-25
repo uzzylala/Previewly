@@ -2,7 +2,6 @@ import { getTranslations } from "next-intl/server";
 
 import { Link } from "@/i18n/navigation";
 import { defaultLocale, type Locale } from "@/i18n/locales";
-import { unprefixedPath } from "@/lib/urls";
 
 import { ArrowIcon } from "./ui/arrow-icon";
 
@@ -12,7 +11,8 @@ import { ArrowIcon } from "./ui/arrow-icon";
  * gets English body copy and can't tell a missing translation from a bug. It sits in the
  * visitor's own language and links to the page it is a copy of.
  */
-export async function FallbackNotice({ locale, slug }: { locale: Locale; slug: string }) {
+/** `path` is the default-locale version of the current page, without its locale prefix. */
+export async function FallbackNotice({ locale, path }: { locale: Locale; path: string }) {
   const t = await getTranslations("Fallback");
   const languages = await getTranslations("Languages");
   const fallback = languages(defaultLocale);
@@ -22,7 +22,7 @@ export async function FallbackNotice({ locale, slug }: { locale: Locale; slug: s
       <p className="mx-auto flex max-w-page flex-wrap items-center gap-x-4 gap-y-1 px-gutter py-3 text-sm text-ink-soft">
         <span>{t("notice", { language: languages(locale), fallback })}</span>
         <Link
-          href={unprefixedPath(slug)}
+          href={path}
           locale={defaultLocale}
           className="inline-flex items-center gap-1.5 font-medium text-proof underline decoration-1 underline-offset-4 hover:decoration-2"
         >

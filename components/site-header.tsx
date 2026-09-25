@@ -16,12 +16,15 @@ export async function SiteHeader({ languages }: { languages: LanguageOption[] })
           <Wordmark />
         </Link>
         <div className="flex items-center gap-x-8">
-          <nav aria-label={site("primaryNav")} className="hidden items-center gap-6 text-sm md:flex">
-            <Link href="/#how-it-works" className="text-ink-soft transition-colors hover:text-proof">
+          <nav aria-label={site("primaryNav")} className="flex items-center gap-6 text-sm">
+            <Link href="/#how-it-works" className="hidden text-ink-soft transition-colors hover:text-proof md:inline">
               {nav("howItWorks")}
             </Link>
-            <Link href="/#faq" className="text-ink-soft transition-colors hover:text-proof">
+            <Link href="/#faq" className="hidden text-ink-soft transition-colors hover:text-proof md:inline">
               {nav("faq")}
+            </Link>
+            <Link href="/blog" className="text-ink-soft transition-colors hover:text-proof">
+              {nav("blog")}
             </Link>
           </nav>
           <LanguageSwitcher options={languages} />

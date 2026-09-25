@@ -52,3 +52,12 @@ export function resolveImage(image: SanityImageSource | undefined): ResolvedImag
     blurDataURL: asset.metadata?.lqip ?? undefined,
   };
 }
+
+/**
+ * A 1200x630 crop for Open Graph / Twitter cards, honouring the editor's crop and hotspot.
+ * Absolute (Sanity CDN) so crawlers can fetch it directly.
+ */
+export function ogImageUrl(image: SanityImageSource | undefined): string | null {
+  if (!image?.asset?._id) return null;
+  return builder.image(image).width(1200).height(630).fit("crop").auto("format").url();
+}

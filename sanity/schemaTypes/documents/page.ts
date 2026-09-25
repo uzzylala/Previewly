@@ -31,9 +31,13 @@ export const page = defineType({
       options: { source: "title", slugify, isUnique: isUniqueInLanguage },
       validation: (rule) =>
         rule.required().custom((value) =>
-          !value?.current || SLUG_PATTERN.test(value.current)
+          !value?.current
             ? true
-            : "Use letters and numbers separated by single hyphens (no spaces, slashes or symbols).",
+            : value.current === "blog"
+              ? '"blog" is reserved for the blog index (/<language>/blog).'
+              : SLUG_PATTERN.test(value.current)
+                ? true
+                : "Use letters and numbers separated by single hyphens (no spaces, slashes or symbols).",
         ),
     }),
     defineField({

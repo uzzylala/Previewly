@@ -1,6 +1,6 @@
-import { defineArrayMember, defineField, defineType } from "sanity";
+import { defineField, defineType } from "sanity";
 
-import { anchorField, eyebrowField } from "../fields";
+import { anchorField, eyebrowField, richTextMember } from "../fields";
 
 export const richText = defineType({
   name: "richText",
@@ -13,39 +13,7 @@ export const richText = defineType({
       type: "array",
       validation: (rule) => rule.required(),
       of: [
-        defineArrayMember({
-          type: "block",
-          styles: [
-            { title: "Paragraph", value: "normal" },
-            { title: "Heading", value: "h2" },
-            { title: "Subheading", value: "h3" },
-            { title: "Quote", value: "blockquote" },
-          ],
-          lists: [
-            { title: "Bullets", value: "bullet" },
-            { title: "Numbered", value: "number" },
-          ],
-          marks: {
-            decorators: [
-              { title: "Strong", value: "strong" },
-              { title: "Emphasis", value: "em" },
-            ],
-            annotations: [
-              defineArrayMember({
-                name: "link",
-                type: "object",
-                fields: [
-                  defineField({
-                    name: "href",
-                    type: "url",
-                    validation: (rule) =>
-                      rule.required().uri({ allowRelative: true, scheme: ["http", "https", "mailto"] }),
-                  }),
-                ],
-              }),
-            ],
-          },
-        }),
+        richTextMember,
       ],
     }),
     anchorField,

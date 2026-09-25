@@ -66,16 +66,73 @@ export const SITEMAP_QUERY = defineQuery(`
 `);
 
 /**
- * Used by the publish webhook: every language version linked to the given page, and the
- * versions named by a translation.metadata document.
+ * A blog post, with its real translations. Like pages, the post is looked up by
+ * (language, slug); the cover image and body are projected for rendering.
  */
-export const SIBLINGS_OF_PAGE_QUERY = defineQuery(`
+export const POST_QUERY = defineQuery(`
+  *[_type == "post" && slug.current == $slug && language == $language][0]{
+    _id,
+    _updatedAt,
+    language,
+    "slug": slug.current,
+    title,
+    excerpt,
+    author,
+    publishedAt,
+    tags,
+    noindex,
+    coverImage ${IMAGE},
+    body,
+    "translations": ${TRANSLATIONS}
+  }
+`);
+
+/**
+ * Everything the blog index, tag filter and search need for one language, newest first.
+ * Deliberately compact (no body): the whole list is small enough to filter in the browser.
+ */
+export const POST_INDEX_QUERY = defineQuery(`
+  *[_type == "post" && language == $language && defined(slug.current) && noindex != true]
+    | order(publishedAt desc){
+    _id,
+    "slug": slug.current,
+    title,
+    excerpt,
+    author,
+    publishedAt,
+    tags,
+    coverImage ${IMAGE}
+  }
+`);
+
+export const POST_PARAMS_QUERY = defineQuery(`
+  *[_type == "post" && defined(slug.current) && defined(language)]{
+    language,
+    "slug": slug.current
+  }
+`);
+
+export const SITEMAP_POSTS_QUERY = defineQuery(`
+  *[_type == "post" && defined(slug.current) && defined(language) && noindex != true]{
+    language,
+    "slug": slug.current,
+    _updatedAt,
+    "translations": ${TRANSLATIONS}
+  }
+`);
+
+/**
+ * Used by the publish webhook: every document (page or post) linked to the given one, and
+ * the documents named by a translation.metadata document.
+ */
+export const SIBLINGS_OF_DOC_QUERY = defineQuery(`
   *[_type == "translation.metadata" && references($id)].translations[]{
     language,
+    "type": value->_type,
     "slug": value->slug.current
   }
 `);
 
-export const PAGES_BY_ID_QUERY = defineQuery(`
-  *[_type == "page" && _id in $ids]{ language, "slug": slug.current }
+export const DOCS_BY_ID_QUERY = defineQuery(`
+  *[_type in ["page", "post"] && _id in $ids]{ _type, language, "slug": slug.current }
 `);

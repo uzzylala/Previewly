@@ -29,7 +29,7 @@ export default defineConfig({
     // "Translations" menu to a page, and keeps each language's draft/publish independent.
     documentInternationalization({
       supportedLanguages: locales.map((id) => ({ id, title: localeMeta[id].title })),
-      schemaTypes: ["page"],
+      schemaTypes: ["page", "post"],
     }),
     // Live preview of drafts in the real site. The Studio mints a short-lived secret from
     // the editor's session; /api/draft-mode/enable validates it server-side.
@@ -48,12 +48,30 @@ export default defineConfig({
             filter: `_type == "page" && slug.current == "home" && language == $language`,
           },
           {
+            route: "/:language/blog/:slug",
+            filter: `_type == "post" && slug.current == $slug && language == $language`,
+          },
+          {
             route: "/:language/:slug",
             filter: `_type == "page" && slug.current == $slug && language == $language`,
           },
         ]),
         // ...and which URLs a document appears on.
         locations: {
+          post: defineLocations({
+            select: { title: "title", slug: "slug.current", language: "language" },
+            resolve: (doc) => ({
+              locations: [
+                {
+                  title: `${doc?.title || "Untitled post"}${doc?.language ? ` (${doc.language.toUpperCase()})` : ""}`,
+                  href: doc?.slug
+                    ? `/${doc.language ?? "en"}/blog/${encodeURIComponent(doc.slug)}`
+                    : `/${doc?.language ?? "en"}/blog`,
+                },
+                { title: "Blog index", href: `/${doc?.language ?? "en"}/blog` },
+              ],
+            }),
+          }),
           page: defineLocations({
             select: { title: "title", slug: "slug.current", language: "language" },
             resolve: (doc) => ({

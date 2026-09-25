@@ -8,7 +8,8 @@
   },
   "Nav": {
     "howItWorks": "Comment ça marche",
-    "faq": "FAQ"
+    "faq": "FAQ",
+    "blog": "Blog"
   },
   "Language": {
     "label": "Langue",
@@ -45,5 +46,26 @@
     "title": "Page introuvable",
     "body": "Cette page n'existe pas, ou elle n'a pas encore été publiée.",
     "home": "Retour à l'accueil"
+  },
+  "Blog": {
+    "eyebrow": "Blog",
+    "title": "Blog",
+    "description": "Notes sur les aperçus, la localisation et une publication sans surprise.",
+    "loading": "Chargement des articles…",
+    "searchLabel": "Rechercher des articles",
+    "searchPlaceholder": "Titre, sujet ou auteur",
+    "search": "Rechercher",
+    "tagsLabel": "Filtrer par étiquette",
+    "allTags": "Tous",
+    "results": "{count, plural, one {# article} other {# articles}}",
+    "noResults": "Aucun article ne correspond à votre recherche.",
+    "noPosts": "Aucun article dans cette langue pour le moment.",
+    "pagination": "Pagination",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "page": "Page {page}",
+    "by": "Par {author}",
+    "published": "Publié le",
+    "back": "Tous les articles"
   }
 }

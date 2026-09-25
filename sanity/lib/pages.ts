@@ -83,6 +83,16 @@ export function getSitemapPages() {
   return sanityFetch({ query: SITEMAP_QUERY, tags: [cacheTags.pageList] });
 }
 
+/** How a kind of document (page, post) maps to URLs. */
+export type DocKind = {
+  full: (locale: Locale, slug: string) => string;
+  /** Path without the locale prefix. */
+  bare: (slug: string) => string;
+  /** Where the switcher sends a visitor when the document has no version to show at all. */
+  missing: string;
+};
+export const pageKind: DocKind = { full: pagePath, bare: unprefixedPath, missing: "/" };
+
 type Translation = { language: string | null; slug: string | null; noindex?: boolean | null };
 type Versioned = Pick<Page, "language" | "slug"> & { noindex?: boolean | null; translations: Translation[] | null };
 type Versions = Partial<Record<Locale, { slug: string; noindex: boolean }>>;
@@ -107,12 +117,12 @@ export function realVersions(page: Versioned): Versions {
  * is one, otherwise the page itself (its only version). URLs are absolute and
  * percent-encoded, as hreflang requires.
  */
-export function alternateLanguages(page: Versioned, ownUrl: string): Record<string, string> {
+export function alternateLanguages(page: Versioned, ownUrl: string, kind: DocKind = pageKind): Record<string, string> {
   const versions = realVersions(page);
   const languages: Record<string, string> = {};
   for (const l of locales) {
     const version = versions[l];
-    if (version && !version.noindex) languages[l] = absoluteUrl(pagePath(l, version.slug));
+    if (version && !version.noindex) languages[l] = absoluteUrl(kind.full(l, version.slug));
   }
   languages["x-default"] = languages[defaultLocale] ?? ownUrl;
   return languages;
@@ -135,14 +145,14 @@ export type LocaleLink = {
  *    source with a "not yet translated" notice, in that locale's chrome;
  *  - a page with no default-locale source either: that locale's homepage.
  */
-export function localeLinks(page: Page, requested: Locale): LocaleLink[] {
+export function localeLinks(page: Versioned, requested: Locale, kind: DocKind = pageKind): LocaleLink[] {
   const versions = realVersions(page);
   const source = versions[defaultLocale]?.slug;
 
   return locales.map((locale) => {
     const real = versions[locale];
-    const slug = real?.slug ?? source ?? HOME_SLUG;
-    return { locale, path: unprefixedPath(slug), translated: Boolean(real), current: locale === requested };
+    const slug = real?.slug ?? source;
+    return { locale, path: slug ? kind.bare(slug) : kind.missing, translated: Boolean(real), current: locale === requested };
   });
 }
 

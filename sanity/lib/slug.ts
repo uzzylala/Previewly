@@ -27,8 +27,8 @@ export const isUniqueInLanguage: SlugIsUniqueValidator = async (slug, context) =
   if (!slug) return true;
   const id = (document?._id ?? "").replace(/^drafts\./, "");
   const count = await getClient({ apiVersion }).fetch<number>(
-    `count(*[_type == "page" && slug.current == $slug && language == $language && !(_id in [$id, $draftId])])`,
-    { slug, language: document?.language ?? null, id, draftId: `drafts.${id}` },
+    `count(*[_type == $type && slug.current == $slug && language == $language && !(_id in [$id, $draftId])])`,
+    { type: document?._type, slug, language: document?.language ?? null, id, draftId: `drafts.${id}` },
   );
   return count === 0;
 };
