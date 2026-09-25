@@ -61,19 +61,18 @@ export function Hero({ eyebrow, heading, emphasis, body, actions, image }: Block
           )}
         </Stagger>
 
+        {/* Outside the entrance: the image is the LCP element, so it paints the moment it arrives. */}
         {hasImage && (
-          <Stagger className="md:col-span-5">
-            <StaggerItem>
-              <figure className="crop-marks mx-6 md:mx-0">
-                <SanityImage
-                  image={image}
-                  sizes="(min-width: 76rem) 30rem, (min-width: 768px) 40vw, calc(100vw - 5.5rem)"
-                  className="h-auto w-full bg-paper-deep"
-                  preload
-                />
-              </figure>
-            </StaggerItem>
-          </Stagger>
+          <div className="md:col-span-5">
+            <figure className="crop-marks mx-6 md:mx-0">
+              <SanityImage
+                image={image}
+                sizes="(min-width: 76rem) 30rem, (min-width: 768px) 40vw, calc(100vw - 5.5rem)"
+                className="h-auto w-full bg-paper-deep"
+                preload
+              />
+            </figure>
+          </div>
         )}
       </div>
     </section>

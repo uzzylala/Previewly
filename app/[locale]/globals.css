@@ -267,3 +267,8 @@
 :lang(ar) em {
   font-weight: 600;
 }
+/* The wordmark is always Latin (lang="en"); the Arabic rules above must not reach into it. */
+[lang="en"] > em.display-emphasis {
+  font-style: italic;
+  font-weight: 400;
+}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans_Arabic, Instrument_Sans, Newsreader, Noto_Naskh_Arabic } from "next/font/google";
+import { IBM_Plex_Sans_Arabic, Instrument_Sans, Noto_Naskh_Arabic } from "next/font/google";
+import localFont from "next/font/local";
 import { NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 
@@ -11,11 +12,17 @@ import { siteUrl } from "@/lib/site";
 
 import "./globals.css";
 
-const newsreader = Newsreader({
+// Newsreader is only ever set at its regular weight, so it is self-hosted as a single-weight
+// file that keeps the optical-size axis (the high-contrast cut at display sizes). The Google
+// loader only honours `axes` for the full 200-800 weight range, which is 272 KB for the pair
+// against 120 KB here. Latin subset, downloaded from Google Fonts (SIL Open Font License).
+const newsreader = localFont({
   variable: "--font-newsreader",
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-  axes: ["opsz"],
+  src: [
+    { path: "../fonts/newsreader-normal.woff2", weight: "400", style: "normal" },
+    { path: "../fonts/newsreader-italic.woff2", weight: "400", style: "italic" },
+  ],
+  display: "swap",
 });
 
 // Italic is loaded so body-copy <em> gets a true italic rather than a synthesised slant

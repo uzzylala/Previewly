@@ -7,6 +7,7 @@ type Props = {
   /** Required: tells the browser which srcset width to pick at each breakpoint. */
   sizes: string;
   className?: string;
+  /** Marks the likely LCP image: preloaded, and fetched ahead of fonts and scripts. */
   preload?: boolean;
 };
 
@@ -28,6 +29,7 @@ export function SanityImage({ image, sizes, className, preload }: Props) {
       sizes={sizes}
       className={className}
       preload={preload}
+      fetchPriority={preload ? "high" : undefined}
       {...(resolved.blurDataURL
         ? { placeholder: "blur" as const, blurDataURL: resolved.blurDataURL }
         : {})}
