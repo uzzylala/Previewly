@@ -1,40 +1,33 @@
-"use client";
+import type { CSSProperties, ReactNode } from "react";
 
-import { motion, type Variants } from "motion/react";
+/**
+ * The hero's one-off entrance (a fade-up in sequence, words rising one after another),
+ * done in CSS rather than in JavaScript.
+ *
+ * It used to be a Motion animation that server-rendered its start state (opacity 0), so on
+ * a phone the hero, which is the largest contentful paint, stayed invisible until the
+ * JavaScript arrived and hydrated (over 4 s on a throttled connection), and forever without
+ * JavaScript. A CSS animation runs from the first paint with no script. Under
+ * prefers-reduced-motion the global rule collapses it to its end state at once.
+ */
+type Props = { children: ReactNode; className?: string };
+type Indexed = Props & { index?: number };
 
-const EASE = [0.22, 1, 0.36, 1] as const; // --ease-out-quint
+const delay = (index: number, step: number, offset = 50): CSSProperties => ({
+  animationDelay: `${index * step + offset}ms`,
+});
 
-const container: Variants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
-};
-
-const item: Variants = {
-  hidden: { opacity: 0, y: 14 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE } },
-};
-
-const word: Variants = {
-  hidden: { opacity: 0, y: "0.45em" },
-  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: EASE } },
-};
-
-type Props = { children: React.ReactNode; className?: string };
-
-/** Orchestrates a one-off entrance for its StaggerItem / StaggerWords descendants. */
+/** Groups StaggerItem / StaggerWords descendants. Kept as a component so callers read the same. */
 export function Stagger({ children, className }: Props) {
-  return (
-    <motion.div className={className} variants={container} initial="hidden" animate="show">
-      {children}
-    </motion.div>
-  );
+  return <div className={className}>{children}</div>;
 }
 
-export function StaggerItem({ children, className }: Props) {
+/** `index` is its place in the sequence: each step waits 90 ms after the last. */
+export function StaggerItem({ children, className, index = 0 }: Indexed) {
   return (
-    <motion.div data-reveal="" className={className} variants={item}>
+    <div data-reveal="" className={`rise ${className ?? ""}`} style={delay(index, 90)}>
       {children}
-    </motion.div>
+    </div>
   );
 }
 
@@ -43,18 +36,17 @@ type WordsProps = {
   segments: { text: string; em?: boolean }[];
   className?: string;
   emClassName?: string;
+  index?: number;
 };
 
 /**
  * A heading whose words rise into place one after another, like lines set on a proof.
  * The full text stays in the DOM as real words, so it reads normally to assistive tech.
  */
-export function StaggerWords({ segments, className, emClassName }: WordsProps) {
+export function StaggerWords({ segments, className, emClassName, index = 0 }: WordsProps) {
+  let word = 0;
   return (
-    <motion.h1
-      className={className}
-      variants={{ hidden: {}, show: { transition: { staggerChildren: 0.045 } } }}
-    >
+    <h1 className={className}>
       {segments.map((segment, s) =>
         segment.text
           .split(/(\s+)/)
@@ -63,17 +55,17 @@ export function StaggerWords({ segments, className, emClassName }: WordsProps) {
             /^\s+$/.test(token) ? (
               " "
             ) : (
-              <motion.span
+              <span
                 key={`${s}-${t}`}
                 data-reveal=""
-                variants={word}
-                className={`inline-block ${segment.em ? (emClassName ?? "") : ""}`}
+                className={`rise-word ${segment.em ? (emClassName ?? "") : ""}`}
+                style={delay(word++, 45, index * 90 + 50)}
               >
                 {token}
-              </motion.span>
+              </span>
             ),
           ),
       )}
-    </motion.h1>
+    </h1>
   );
 }

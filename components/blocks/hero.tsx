@@ -33,24 +33,25 @@ export function Hero({ eyebrow, heading, emphasis, body, actions, image }: Block
           className={`flex flex-col items-start gap-6 ${hasImage ? "md:col-span-7" : "md:col-span-10"}`}
         >
           {eyebrow && (
-            <StaggerItem>
+            <StaggerItem index={0}>
               <p className="text-xs font-medium tracking-label text-proof uppercase">{eyebrow}</p>
             </StaggerItem>
           )}
           {heading && (
             <StaggerWords
+              index={1}
               segments={headingSegments(heading, emphasis)}
               className="max-w-[16ch] font-display text-display font-normal"
               emClassName="display-emphasis"
             />
           )}
           {body && (
-            <StaggerItem>
+            <StaggerItem index={2}>
               <p className="max-w-measure text-lg text-ink-soft">{body}</p>
             </StaggerItem>
           )}
           {links.length > 0 && (
-            <StaggerItem className="mt-2 flex flex-wrap items-center gap-x-8 gap-y-3">
+            <StaggerItem index={3} className="mt-2 flex flex-wrap items-center gap-x-8 gap-y-3">
               {links.map((link, i) => (
                 <ActionLink key={link._key} href={link.href} variant={i === 0 ? "primary" : "secondary"}>
                   {link.label}
