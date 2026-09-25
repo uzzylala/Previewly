@@ -21,8 +21,10 @@ export async function PageShell({
   return (
     <>
       <SiteHeader languages={languages} />
-      {notice}
-      <main className="flex-1">{children}</main>
+      <main id="content" tabIndex={-1} className="flex-1 focus:outline-none">
+        {notice}
+        {children}
+      </main>
       <SiteFooter />
     </>
   );

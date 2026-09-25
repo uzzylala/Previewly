@@ -25,6 +25,7 @@ export async function LocalizedPage({ locale, slug }: { locale: Locale; slug: st
   const { page, isFallback } = result;
   const t = await getTranslations("Page");
   const format = await getFormatter();
+  const hasHero = (page.blocks ?? []).some((block) => block._type === "hero" && "heading" in block && block.heading);
   const updated = page._updatedAt ? new Date(page._updatedAt) : null;
 
   return (
@@ -34,6 +35,9 @@ export async function LocalizedPage({ locale, slug }: { locale: Locale; slug: st
     >
       {/* The body of a fallback is in the default language, whatever the page around it is. */}
       <div {...(isFallback ? { lang: defaultLocale, dir: localeMeta[defaultLocale].dir } : {})}>
+        {/* Every page needs exactly one h1. A hero renders it; without one, the page title is
+            the h1 for assistive tech (the visible headline is the first block's own heading). */}
+        {!hasHero && page.title && <h1 className="sr-only">{page.title}</h1>}
         <BlockRenderer blocks={page.blocks} />
       </div>
       {updated && (

@@ -66,6 +66,7 @@
     "page": "Page {page}",
     "by": "Par {author}",
     "published": "Publié le",
-    "back": "Tous les articles"
+    "back": "Tous les articles",
+    "pageOf": "Page {page} sur {total}"
   }
 }

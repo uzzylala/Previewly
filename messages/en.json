@@ -66,6 +66,7 @@
     "page": "Page {page}",
     "by": "By {author}",
     "published": "Published",
-    "back": "All posts"
+    "back": "All posts",
+    "pageOf": "Page {page} of {total}"
   }
 }

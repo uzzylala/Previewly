@@ -11,12 +11,12 @@ export async function SiteHeader({ languages }: { languages: LanguageOption[] })
 
   return (
     <header className="border-b border-rule">
-      <div className="mx-auto flex min-h-16 max-w-page items-center justify-between gap-x-6 gap-y-2 px-gutter">
+      <div className="mx-auto flex min-h-16 max-w-page flex-wrap items-center justify-between gap-x-6 gap-y-1 px-gutter py-1">
         <Link href="/" aria-label={site("homeLabel")} className="rounded-xs">
           <Wordmark />
         </Link>
-        <div className="flex items-center gap-x-8">
-          <nav aria-label={site("primaryNav")} className="flex items-center gap-6 text-sm">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-1 sm:gap-x-8">
+          <nav aria-label={site("primaryNav")} className="flex items-center gap-4 text-sm sm:gap-6">
             <Link href="/#how-it-works" className="hidden text-ink-soft transition-colors hover:text-proof md:inline">
               {nav("howItWorks")}
             </Link>

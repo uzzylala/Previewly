@@ -61,6 +61,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function LocaleLayout({ children }: LayoutProps<"/[locale]">) {
   const locale = await currentLocale();
+  const site = await getTranslations({ locale, namespace: "Site" });
 
   return (
     <html
@@ -71,6 +72,12 @@ export default async function LocaleLayout({ children }: LayoutProps<"/[locale]"
       <body className="flex min-h-dvh flex-col">
         <NextIntlClientProvider>
           <MotionProvider>
+            <a
+              href="#content"
+              className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-[60] focus:rounded-xs focus:bg-ink focus:px-4 focus:py-3 focus:text-paper"
+            >
+              {site("skipToContent")}
+            </a>
             <DraftModePreview />
             {children}
           </MotionProvider>

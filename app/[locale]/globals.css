@@ -129,6 +129,11 @@
     outline: 2px solid var(--color-proof);
     outline-offset: 3px;
   }
+
+  /* Proof blue is 2.1:1 on ink and 1.2:1 on the draft red, so on dark grounds the ring is paper. */
+  :where(.bg-ink, .bg-mark) :focus-visible {
+    outline-color: var(--color-paper);
+  }
 }
 
 /*

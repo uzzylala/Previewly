@@ -33,7 +33,7 @@ export function PreviewBar() {
         <p className="flex items-center gap-3">
           <span aria-hidden className="size-2 rounded-full bg-paper" />
           <span className="font-medium tracking-label uppercase">{t("viewingDraft")}</span>
-          <span className="hidden text-paper/85 sm:inline">{t("unpublished")}</span>
+          <span className="hidden text-paper sm:inline">{t("unpublished")}</span>
         </p>
         <form method="GET" action="/api/draft-mode/disable">
           <input type="hidden" name="redirect" value={returnTo} />

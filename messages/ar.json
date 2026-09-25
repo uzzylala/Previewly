@@ -66,6 +66,7 @@
     "page": "الصفحة {page}",
     "by": "بقلم {author}",
     "published": "نُشر في",
-    "back": "كل المقالات"
+    "back": "كل المقالات",
+    "pageOf": "الصفحة {page} من {total}"
   }
 }

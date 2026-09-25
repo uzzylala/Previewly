@@ -123,7 +123,13 @@ export function BlogBrowser({ posts, initial }: { posts: PostSummary[]; initial:
         )}
 
         <p role="status" className="text-sm text-ink-soft">
-          {filtered.length > 0 ? t("results", { count: filtered.length }) : hasFilter ? t("noResults") : t("noPosts")}
+          {filtered.length > 0
+            ? [t("results", { count: filtered.length }), pageCount > 1 ? t("pageOf", { page: format.number(page, { numberingSystem: "latn" }), total: format.number(pageCount, { numberingSystem: "latn" }) }) : ""]
+                .filter(Boolean)
+                .join(" · ")
+            : hasFilter
+              ? t("noResults")
+              : t("noPosts")}
         </p>
       </div>
 
@@ -243,9 +249,10 @@ function PageLink({
   children: React.ReactNode;
 }) {
   const className = "inline-flex min-h-11 items-center gap-2 text-base font-medium";
-  // A disabled link is not a link: it is removed from the tab order and the a11y tree's link list.
+  // A disabled link is not a link: it is hidden entirely (keeping its space so the layout
+  // doesn't jump), so it is out of the tab order and the accessibility tree.
   return disabled ? (
-    <span aria-hidden className={`${className} text-ink-soft/50`}>
+    <span aria-hidden className={`${className} invisible`}>
       {children}
     </span>
   ) : (
