@@ -11,7 +11,9 @@ export type FaqEntry = { key: string; question: string; paragraphs: string[] };
  * toggles, and Up/Down/Home/End move focus between questions. Closed answers stay in
  * the DOM (indexable) but are inert, so they're skipped by focus and screen readers.
  */
-export function FaqAccordion({ entries }: { entries: FaqEntry[] }) {
+export type FaqLabels = { count: string; expandAll: string; collapseAll: string };
+
+export function FaqAccordion({ entries, labels }: { entries: FaqEntry[]; labels: FaqLabels }) {
   const [open, setOpen] = useState<Set<string>>(() => new Set());
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
   const baseId = useId();
@@ -24,6 +26,9 @@ export function FaqAccordion({ entries }: { entries: FaqEntry[] }) {
       else next.add(key);
       return next;
     });
+
+  const allOpen = open.size === entries.length;
+  const toggleAll = () => setOpen(allOpen ? new Set() : new Set(entries.map((entry) => entry.key)));
 
   const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
     const last = entries.length - 1;
@@ -39,7 +44,18 @@ export function FaqAccordion({ entries }: { entries: FaqEntry[] }) {
   };
 
   return (
-    <div className="border-b border-rule">
+    <div>
+      <div className="mb-3 flex items-baseline justify-between gap-4 text-sm text-ink-soft">
+        <p>{labels.count}</p>
+        <button
+          type="button"
+          onClick={toggleAll}
+          className="rounded-xs py-1 font-medium text-proof underline decoration-1 underline-offset-4 hover:decoration-2"
+        >
+          {allOpen ? labels.collapseAll : labels.expandAll}
+        </button>
+      </div>
+      <div className="border-b border-rule">
       {entries.map((entry, index) => {
         const isOpen = open.has(entry.key);
         const buttonId = `${baseId}-q-${index}`;
@@ -66,7 +82,7 @@ export function FaqAccordion({ entries }: { entries: FaqEntry[] }) {
                   className={`relative size-3 shrink-0 self-center text-ink-soft transition-transform duration-300 ease-out-quint group-hover:text-proof motion-reduce:transition-none ${isOpen ? "rotate-45" : ""}`}
                 >
                   <span className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-current" />
-                  <span className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-current" />
+                  <span className="absolute inset-y-0 inset-x-0 mx-auto w-px bg-current" />
                 </span>
               </button>
             </h3>
@@ -89,6 +105,7 @@ export function FaqAccordion({ entries }: { entries: FaqEntry[] }) {
           </div>
         );
       })}
+      </div>
     </div>
   );
 }

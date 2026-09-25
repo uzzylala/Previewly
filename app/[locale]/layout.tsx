@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
-import { Instrument_Sans, Newsreader } from "next/font/google";
+import { IBM_Plex_Sans_Arabic, Instrument_Sans, Newsreader, Noto_Naskh_Arabic } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
 import { DraftModePreview } from "@/components/preview/draft-mode-preview";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
 import { MotionProvider } from "@/components/ui/motion-provider";
+import { currentLocale } from "@/i18n/current";
+import { localeMeta, locales } from "@/i18n/locales";
 import { siteUrl } from "@/lib/site";
 
 import "./globals.css";
@@ -23,26 +25,56 @@ const instrumentSans = Instrument_Sans({
   style: ["normal", "italic"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: { default: "Previewly", template: "%s · Previewly" },
-  description:
-    "Draft in your CMS, preview in the real site design, publish with confidence.",
-};
+// The approved Arabic pairing: Noto Naskh Arabic for display type (the counterpart of the
+// Newsreader serif) and IBM Plex Sans Arabic for text (the counterpart of Instrument Sans).
+// Their files are only fetched by pages that actually contain Arabic, since the browser
+// downloads a font only when a glyph needs it; preload is off so other locales don't pay
+// for a hint they will never use.
+const notoNaskhArabic = Noto_Naskh_Arabic({
+  variable: "--font-noto-naskh-arabic",
+  subsets: ["arabic"],
+  display: "swap",
+  preload: false,
+});
 
-export default function SiteLayout({ children }: LayoutProps<"/">) {
+const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
+  variable: "--font-ibm-plex-sans-arabic",
+  subsets: ["arabic"],
+  weight: ["400", "500", "600"],
+  display: "swap",
+  preload: false,
+});
+
+export function generateStaticParams() {
+  return locales.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await currentLocale();
+  const t = await getTranslations({ locale, namespace: "Site" });
+  return {
+    metadataBase: new URL(siteUrl),
+    title: { default: "Previewly", template: "%s · Previewly" },
+    description: t("description"),
+  };
+}
+
+export default async function LocaleLayout({ children }: LayoutProps<"/[locale]">) {
+  const locale = await currentLocale();
+
   return (
     <html
-      lang="en"
-      className={`${newsreader.variable} ${instrumentSans.variable}`}
+      lang={locale}
+      dir={localeMeta[locale].dir}
+      className={`${newsreader.variable} ${instrumentSans.variable} ${notoNaskhArabic.variable} ${ibmPlexSansArabic.variable}`}
     >
       <body className="flex min-h-dvh flex-col">
-        <MotionProvider>
-          <DraftModePreview />
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
-        </MotionProvider>
+        <NextIntlClientProvider>
+          <MotionProvider>
+            <DraftModePreview />
+            {children}
+          </MotionProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

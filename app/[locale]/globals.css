@@ -22,6 +22,9 @@
   --font-*: initial;
   --font-display: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
   --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  /* Arabic pairing from the approved direction: Naskh for display, Plex Sans Arabic for text */
+  --font-display-arabic: var(--font-noto-naskh-arabic), "Noto Naskh Arabic", "Traditional Arabic", serif;
+  --font-sans-arabic: var(--font-ibm-plex-sans-arabic), "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
 
   /* 1.250 (major third) scale from a 16px base */
   --text-*: initial;
@@ -79,6 +82,26 @@
     font-family: var(--font-sans);
   }
 
+  /*
+   * Fonts follow the language of the element, not the page: an English fallback body
+   * inside an Arabic page (lang="en") gets the Latin fonts, and the wordmark stays Latin.
+   * The custom properties are redeclared on the element so the utilities (font-display,
+   * font-sans) resolve per language, and font-family is re-applied so a nested language
+   * boundary doesn't inherit its parent's resolved font.
+   */
+  :lang(ar) {
+    --font-display: var(--font-display-arabic);
+    --font-sans: var(--font-sans-arabic);
+  }
+  :lang(en),
+  :lang(fr) {
+    --font-display: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
+    --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  }
+  [lang] {
+    font-family: var(--font-sans);
+  }
+
   h1,
   h2,
   h3 {
@@ -119,7 +142,10 @@
 }
 
 @layer components {
-  /* Printer's crop marks at each corner of a framed element. */
+  /*
+   * Printer's crop marks at each corner of a framed element. The four corners are
+   * identical, so the mark is mirror-symmetric and needs no RTL variant.
+   */
   .crop-marks {
     --mark-size: 14px;
     --mark-gap: 8px;
@@ -152,4 +178,34 @@
       linear-gradient(var(--c), var(--c)) right calc(var(--s) + var(--mark-gap)) bottom 0 / 1px var(--s);
     background-repeat: no-repeat;
   }
+}
+
+/*
+ * Arabic typography. Unlayered on purpose, so these beat the tracking and leading
+ * utilities the Latin design uses.
+ *
+ * - No letter-spacing at all: tracking breaks the joins between Arabic letters.
+ * - Taller leading: Arabic has tall ascenders and stacked marks that a 1.02 display
+ *   line-height would clip.
+ * - No italics: slanted Arabic is not a thing; the emphasis keeps its colour only.
+ */
+:lang(ar) * {
+  letter-spacing: 0 !important;
+}
+:lang(ar) h1,
+:lang(ar) h2,
+:lang(ar) h3,
+:lang(ar) blockquote {
+  line-height: 1.5;
+}
+:lang(ar) p,
+:lang(ar) li {
+  line-height: 1.9;
+}
+:lang(ar) .display-emphasis,
+:lang(ar) em {
+  font-style: normal;
+}
+:lang(ar) em {
+  font-weight: 600;
 }

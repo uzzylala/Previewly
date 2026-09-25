@@ -1,0 +1,49 @@
+{
+  "Site": {
+    "description": "Draft in your CMS, preview in the real site design, publish with confidence.",
+    "homeLabel": "Previewly home",
+    "tagline": "Draft it. Proof it. Publish it.",
+    "primaryNav": "Primary",
+    "skipToContent": "Skip to content"
+  },
+  "Nav": {
+    "howItWorks": "How it works",
+    "faq": "FAQ"
+  },
+  "Language": {
+    "label": "Language",
+    "switchTo": "Switch to {language}",
+    "notTranslated": "Not translated yet: shows the {fallback} version"
+  },
+  "Languages": {
+    "en": "English",
+    "fr": "French",
+    "ar": "Arabic"
+  },
+  "Fallback": {
+    "notice": "This page hasn't been translated into {language} yet. You're reading the {fallback} version.",
+    "viewOriginal": "View the {fallback} page"
+  },
+  "Page": {
+    "updated": "Last updated {date}"
+  },
+  "Preview": {
+    "viewingDraft": "Viewing a draft",
+    "unpublished": "Unpublished changes are visible only in preview.",
+    "exit": "Exit preview"
+  },
+  "Faq": {
+    "count": "{count, plural, one {# question} other {# questions}}",
+    "expandAll": "Expand all",
+    "collapseAll": "Collapse all"
+  },
+  "Testimonials": {
+    "open": "“",
+    "close": "”"
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "body": "This page doesn't exist, or it hasn't been published yet.",
+    "home": "Back to the homepage"
+  }
+}

@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { PortableText, type PortableTextComponents } from "next-sanity";
 
 import { isInternalHref } from "@/components/ui/action-link";
+import { SiteLink } from "@/components/ui/site-link";
 import { Reveal } from "@/components/ui/reveal";
 
 import type { BlockProps } from "./types";
@@ -38,9 +38,9 @@ const components: PortableTextComponents = {
       const className =
         "text-proof underline decoration-1 underline-offset-4 transition-[text-decoration-thickness] hover:decoration-2";
       return isInternalHref(href) ? (
-        <Link href={href} className={className}>
+        <SiteLink href={href} className={className}>
           {children}
-        </Link>
+        </SiteLink>
       ) : (
         <a href={href} className={className} target="_blank" rel="noopener noreferrer">
           {children}

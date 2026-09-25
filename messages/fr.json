@@ -1,0 +1,49 @@
+{
+  "Site": {
+    "description": "Rédigez dans votre CMS, prévisualisez dans le vrai design du site, publiez en toute confiance.",
+    "homeLabel": "Accueil Previewly",
+    "tagline": "Rédigez. Relisez. Publiez.",
+    "primaryNav": "Principale",
+    "skipToContent": "Aller au contenu"
+  },
+  "Nav": {
+    "howItWorks": "Comment ça marche",
+    "faq": "FAQ"
+  },
+  "Language": {
+    "label": "Langue",
+    "switchTo": "Passer en {language}",
+    "notTranslated": "Pas encore traduit : affiche la version en {fallback}"
+  },
+  "Languages": {
+    "en": "anglais",
+    "fr": "français",
+    "ar": "arabe"
+  },
+  "Fallback": {
+    "notice": "Cette page n'est pas encore traduite en {language}. Vous lisez la version en {fallback}.",
+    "viewOriginal": "Voir la page en {fallback}"
+  },
+  "Page": {
+    "updated": "Dernière mise à jour le {date}"
+  },
+  "Preview": {
+    "viewingDraft": "Vous consultez un brouillon",
+    "unpublished": "Les modifications non publiées ne sont visibles qu'en aperçu.",
+    "exit": "Quitter l'aperçu"
+  },
+  "Faq": {
+    "count": "{count, plural, one {# question} other {# questions}}",
+    "expandAll": "Tout développer",
+    "collapseAll": "Tout réduire"
+  },
+  "Testimonials": {
+    "open": "« ",
+    "close": " »"
+  },
+  "NotFound": {
+    "title": "Page introuvable",
+    "body": "Cette page n'existe pas, ou elle n'a pas encore été publiée.",
+    "home": "Retour à l'accueil"
+  }
+}

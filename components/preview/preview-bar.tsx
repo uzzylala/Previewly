@@ -1,6 +1,7 @@
 "use client";
 
 import { VisualEditing, type VisualEditingProps } from "next-sanity/visual-editing";
+import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
@@ -18,6 +19,7 @@ import { useCallback } from "react";
  * A real navigation has no such cache to be stale.
  */
 export function PreviewBar() {
+  const t = useTranslations("Preview");
   const pathname = usePathname();
   const search = useSearchParams().toString();
   const returnTo = search ? `${pathname}?${search}` : pathname;
@@ -30,8 +32,8 @@ export function PreviewBar() {
       <div className="mx-auto flex max-w-page flex-wrap items-center justify-between gap-x-6 gap-y-2 px-gutter py-2.5 text-sm">
         <p className="flex items-center gap-3">
           <span aria-hidden className="size-2 rounded-full bg-paper" />
-          <span className="font-medium tracking-label uppercase">Viewing a draft</span>
-          <span className="hidden text-paper/85 sm:inline">Unpublished changes are visible only in preview.</span>
+          <span className="font-medium tracking-label uppercase">{t("viewingDraft")}</span>
+          <span className="hidden text-paper/85 sm:inline">{t("unpublished")}</span>
         </p>
         <form method="GET" action="/api/draft-mode/disable">
           <input type="hidden" name="redirect" value={returnTo} />
@@ -39,7 +41,7 @@ export function PreviewBar() {
             type="submit"
             className="rounded-xs border border-paper/70 px-3 py-1 font-medium transition-colors duration-200 hover:bg-paper hover:text-mark focus-visible:outline-paper motion-reduce:transition-none"
           >
-            Exit preview
+            {t("exit")}
           </button>
         </form>
       </div>

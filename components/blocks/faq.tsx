@@ -1,10 +1,12 @@
+import { getTranslations } from "next-intl/server";
+
 import { Reveal } from "@/components/ui/reveal";
 import { SectionHeader } from "@/components/ui/section-header";
 
 import { FaqAccordion, type FaqEntry } from "./faq-accordion";
 import type { BlockProps } from "./types";
 
-export function Faq({ eyebrow, heading, items }: BlockProps<"faq">) {
+export async function Faq({ eyebrow, heading, items }: BlockProps<"faq">) {
   // Reduced version: questions missing either half are dropped individually.
   const entries: FaqEntry[] = (items ?? []).flatMap((item) => {
     const question = item.question?.trim();
@@ -17,13 +19,22 @@ export function Faq({ eyebrow, heading, items }: BlockProps<"faq">) {
   // Hides itself when no complete question remains.
   if (entries.length === 0) return null;
 
+  const t = await getTranslations("Faq");
+
   return (
     <section className="mx-auto grid max-w-page gap-x-12 gap-y-10 px-gutter py-module md:grid-cols-12">
       <div className="md:col-span-4">
         <SectionHeader eyebrow={eyebrow} heading={heading} />
       </div>
       <Reveal className="md:col-span-8">
-        <FaqAccordion entries={entries} />
+        <FaqAccordion
+          entries={entries}
+          labels={{
+            count: t("count", { count: entries.length }),
+            expandAll: t("expandAll"),
+            collapseAll: t("collapseAll"),
+          }}
+        />
       </Reveal>
     </section>
   );

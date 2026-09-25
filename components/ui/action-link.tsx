@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { SiteLink } from "./site-link";
 
 type Props = {
   href: string;
@@ -35,9 +35,9 @@ export function ActionLink({ href, children, variant = "primary", tone = "defaul
 
   if (isInternalHref(href)) {
     return (
-      <Link href={href} className={className}>
+      <SiteLink href={href} className={className}>
         {children}
-      </Link>
+      </SiteLink>
     );
   }
 

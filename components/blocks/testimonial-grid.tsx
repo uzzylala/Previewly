@@ -1,3 +1,5 @@
+import { getTranslations } from "next-intl/server";
+
 import { Reveal } from "@/components/ui/reveal";
 import { SanityImage } from "@/components/ui/sanity-image";
 import { SectionHeader } from "@/components/ui/section-header";
@@ -40,10 +42,12 @@ function Attribution({ name, role, avatar }: Testimonial) {
   );
 }
 
-export function TestimonialGrid({ eyebrow, heading, testimonials }: BlockProps<"testimonialGrid">) {
+export async function TestimonialGrid({ eyebrow, heading, testimonials }: BlockProps<"testimonialGrid">) {
   const valid = (testimonials ?? []).filter((t) => t.quote?.trim());
   // Hides itself: a testimonial section with no quotes has nothing to say.
   if (valid.length === 0) return null;
+
+  const t = await getTranslations("Testimonials");
 
   const columns =
     valid.length === 1 ? "" : valid.length % 2 === 0 && valid.length < 6 ? "md:grid-cols-2" : "md:grid-cols-2 lg:grid-cols-3";
@@ -59,9 +63,9 @@ export function TestimonialGrid({ eyebrow, heading, testimonials }: BlockProps<"
                 className={`font-display tracking-tight text-ink ${valid.length === 1 ? "max-w-[34ch] text-3xl" : "text-xl"}`}
               >
                 <p>
-                  <span aria-hidden className="text-proof">“</span>
+                  <span aria-hidden className="text-proof">{t("open")}</span>
                   {testimonial.quote}
-                  <span aria-hidden className="text-proof">”</span>
+                  <span aria-hidden className="text-proof">{t("close")}</span>
                 </p>
               </blockquote>
               <Attribution {...testimonial} />

@@ -1,0 +1,49 @@
+{
+  "Site": {
+    "description": "اكتب في نظام إدارة المحتوى، وعاين بتصميم الموقع الحقيقي، وانشر بثقة.",
+    "homeLabel": "الصفحة الرئيسية لـ Previewly",
+    "tagline": "اكتبها. راجعها. انشرها.",
+    "primaryNav": "الرئيسية",
+    "skipToContent": "انتقل إلى المحتوى"
+  },
+  "Nav": {
+    "howItWorks": "كيف تعمل",
+    "faq": "الأسئلة الشائعة"
+  },
+  "Language": {
+    "label": "اللغة",
+    "switchTo": "التبديل إلى {language}",
+    "notTranslated": "غير مترجمة بعد: تعرض النسخة {fallback}"
+  },
+  "Languages": {
+    "en": "الإنجليزية",
+    "fr": "الفرنسية",
+    "ar": "العربية"
+  },
+  "Fallback": {
+    "notice": "لم تُترجم هذه الصفحة إلى {language} بعد. أنت تقرأ النسخة {fallback}.",
+    "viewOriginal": "عرض الصفحة {fallback}"
+  },
+  "Page": {
+    "updated": "آخر تحديث في {date}"
+  },
+  "Preview": {
+    "viewingDraft": "أنت تعرض مسودة",
+    "unpublished": "التغييرات غير المنشورة تظهر في المعاينة فقط.",
+    "exit": "الخروج من المعاينة"
+  },
+  "Faq": {
+    "count": "{count, plural, zero {لا أسئلة} one {سؤال واحد} two {سؤالان} few {# أسئلة} many {# سؤالًا} other {# سؤال}}",
+    "expandAll": "توسيع الكل",
+    "collapseAll": "طيّ الكل"
+  },
+  "Testimonials": {
+    "open": "«",
+    "close": "»"
+  },
+  "NotFound": {
+    "title": "الصفحة غير موجودة",
+    "body": "هذه الصفحة غير موجودة، أو لم تُنشر بعد.",
+    "home": "العودة إلى الصفحة الرئيسية"
+  }
+}
