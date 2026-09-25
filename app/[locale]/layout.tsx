@@ -54,6 +54,8 @@ const instrumentSansItalic = Instrument_Sans({
 const notoNaskhArabic = Noto_Naskh_Arabic({
   variable: "--font-noto-naskh-arabic",
   subsets: ["arabic"],
+  // Display type is only ever set at regular weight; the full 400-700 range is 41 KB heavier.
+  weight: "400",
   display: "swap",
   preload: false,
 });

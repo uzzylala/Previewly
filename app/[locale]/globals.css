@@ -280,6 +280,10 @@ blockquote .italic {
 :lang(ar) em {
   font-style: normal;
 }
+/* Display emphasis is set in Naskh, which is loaded at regular weight only. */
+:lang(ar) .display-emphasis {
+  font-weight: 400;
+}
 :lang(ar) em {
   font-weight: 600;
 }
