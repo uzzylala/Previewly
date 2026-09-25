@@ -14,6 +14,9 @@ import { basename, join } from "node:path";
 
 import { createClient } from "@sanity/client";
 
+import { block, link } from "./helpers.mts";
+import { translationDocuments } from "./translations.mts";
+
 const { NEXT_PUBLIC_SANITY_PROJECT_ID, NEXT_PUBLIC_SANITY_DATASET, SANITY_API_EDITORIAL_TOKEN } =
   process.env;
 
@@ -38,41 +41,6 @@ async function uploadImage(file: string) {
   return { _type: "image" as const, asset: { _type: "reference" as const, _ref: asset._id } };
 }
 
-// --- Portable Text helpers -------------------------------------------------------------
-
-type Span = string | { text: string; marks: string[] };
-type MarkDef = { _key: string; _type: "link"; href: string };
-
-let keySeq = 0;
-const key = (prefix: string) => `${prefix}${++keySeq}`;
-
-function block(
-  style: "normal" | "h2" | "h3" | "blockquote",
-  spans: Span[],
-  opts: { listItem?: "bullet" | "number"; markDefs?: MarkDef[] } = {},
-) {
-  return {
-    _type: "block",
-    _key: key("b"),
-    style,
-    ...(opts.listItem ? { listItem: opts.listItem, level: 1 } : {}),
-    markDefs: opts.markDefs ?? [],
-    children: spans.map((span) => ({
-      _type: "span",
-      _key: key("s"),
-      text: typeof span === "string" ? span : span.text,
-      marks: typeof span === "string" ? [] : span.marks,
-    })),
-  };
-}
-
-const link = (_key: string, label: string, href: string) => ({
-  _type: "link" as const,
-  _key,
-  label,
-  href,
-});
-
 // --- Content ---------------------------------------------------------------------------
 
 async function main() {
@@ -81,6 +49,7 @@ async function main() {
   await client.createOrReplace({
     _id: "page-home",
     _type: "page",
+    language: "en",
     title: "Previewly",
     slug: { _type: "slug", current: "home" },
     noindex: false,
@@ -190,7 +159,7 @@ async function main() {
             _type: "faqItem",
             question: "What happens if a translation is missing?",
             answer:
-              "The block falls back to the default language instead of rendering empty, so a half-translated page never looks broken.",
+              "The page falls back to the default language, with a small notice, instead of rendering empty, so a half-translated site never looks broken.",
           },
           {
             _key: "q5",
@@ -214,6 +183,7 @@ async function main() {
   await client.createOrReplace({
     _id: "page-fixtures",
     _type: "page",
+    language: "en",
     title: "Fixtures",
     slug: { _type: "slug", current: "fixtures" },
     description: "Deliberately malformed content for testing frontend fallbacks. Not for editing.",
@@ -298,7 +268,11 @@ async function main() {
     ],
   });
 
-  console.log("Seeded: page-home, page-fixtures");
+  // French and Arabic versions, an English-only page, and the translation.metadata
+  // documents that link each set of versions together.
+  for (const doc of translationDocuments(heroImage)) await client.createOrReplace(doc);
+
+  console.log("Seeded: pages in en / fr / ar, translation metadata and page-fixtures");
 }
 
 main().catch((error) => {

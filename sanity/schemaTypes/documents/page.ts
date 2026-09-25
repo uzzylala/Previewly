@@ -1,5 +1,6 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
 
+import { isUniqueInLanguage, slugify, SLUG_PATTERN } from "../../lib/slug";
 import { blockTypes } from "../blocks";
 
 /** Seeded test page of deliberately invalid content; see scripts/seed.mts. */
@@ -13,6 +14,9 @@ export const page = defineType({
   // Studio anyway. Read-only makes that explicit instead of a confusing disabled Publish.
   readOnly: ({ document }) => document?._id.replace(/^drafts\./, "") === FIXTURES_PAGE_ID,
   fields: [
+    // Set by @sanity/document-internationalization when a translation is created. Editors
+    // never change it: a document's language is what places it at /<language>/<slug>.
+    defineField({ name: "language", type: "string", readOnly: true, hidden: true }),
     defineField({
       name: "title",
       description: "Used for the browser tab and search results.",
@@ -21,10 +25,16 @@ export const page = defineType({
     }),
     defineField({
       name: "slug",
-      description: 'Use "home" for the homepage.',
+      description:
+        'Use "home" for the homepage. Each language has its own slug, and it can be written in that language (for example "tarifs").',
       type: "slug",
-      options: { source: "title" },
-      validation: (rule) => rule.required(),
+      options: { source: "title", slugify, isUnique: isUniqueInLanguage },
+      validation: (rule) =>
+        rule.required().custom((value) =>
+          !value?.current || SLUG_PATTERN.test(value.current)
+            ? true
+            : "Use letters and numbers separated by single hyphens (no spaces, slashes or symbols).",
+        ),
     }),
     defineField({
       name: "description",
@@ -48,7 +58,13 @@ export const page = defineType({
     }),
   ],
   preview: {
-    select: { title: "title", slug: "slug.current" },
-    prepare: ({ title, slug }) => ({ title, subtitle: slug ? `/${slug === "home" ? "" : slug}` : "No slug" }),
+    select: { title: "title", slug: "slug.current", language: "language" },
+    prepare: ({ title, slug, language }) => ({
+      title,
+      subtitle: [
+        language ? language.toUpperCase() : "No language",
+        slug ? `/${slug === "home" ? "" : slug}` : "No slug",
+      ].join(" · "),
+    }),
   },
 });
