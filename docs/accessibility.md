@@ -12,6 +12,10 @@ Target: WCAG 2.2 AA. Every result below was measured, first on the pre-fix build
 | Reflow | 320 CSS px wide (WCAG 1.4.10) on 10 representative pages, including Arabic |
 | Screen reader | **No real screen reader was run** (no NVDA, JAWS, VoiceOver or Narrator was available to this pass). Instead: Chrome's accessibility tree, the structure those tools read, was dumped for `/ar`, `/ar/blog` and `/fr/pricing` (landmarks, heading outline, accessible names, nested `lang`). Treat that as a proxy and do a real Arabic screen reader pass (NVDA + Firefox, VoiceOver + Safari) before calling this done |
 
+### Screen reader attempt (not completed)
+
+I tried to run a portable NVDA 2026.2 with a silent synthesiser and read what it sent to speech from its debug log. NVDA started and logged speech correctly, but driving the browser needs real OS-level keystrokes, and the automation could not reliably bring the test browser to the foreground on this desktop. The one trial's keystrokes landed in another application's window instead (an image editor), so I stopped, removed the NVDA copy and made no further attempts rather than send keys to windows I can't see. **A manual NVDA (Firefox) and VoiceOver (Safari) pass on /ar, /ar/blog and /fr/pricing is still needed.** Things worth listening for: the untranslated-language option reading "(Not translated yet: shows the English version)", the English fallback body switching voice via `lang="en"`, the search status ("3 posts") and the pagination status ("7 posts · Page 2 of 2").
+
 ## Before and after
 
 | | Before | After |

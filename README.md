@@ -136,8 +136,19 @@ All measured on the deployed site unless noted.
 - **Draft preview:** works for pages and posts in all three locales, with the translated bar; Exit preview clears it; visitors never see a draft.
 - **Language switcher:** stays on the same page, follows localised slugs, handles untranslated pages, sets the `NEXT_LOCALE` cookie (one year), which `/` then honours.
 - **Accessibility:** axe-core, 33 audits (every page type, three locales, draft bar): 15 violating nodes before, **0** after. Keyboard walkthrough, 320 px reflow and accessibility-tree review in [docs/accessibility.md](docs/accessibility.md). No real screen reader pass has been done yet (see limitations).
-- **Reduced motion:** REDUCED_MOTION_RESULT
-- **Lighthouse** (3 runs per configuration, deployed site, ranges across runs): LIGHTHOUSE_RESULT
+- **Reduced motion:** on the deployed blog index (en, fr, ar, page 2), posts (en, fr, ar, a fallback post) and the 404, with `prefers-reduced-motion: reduce` emulated, **0 transitions, 0 animations, and every scroll reveal at its resting state**. Before the fix the same check found leftover colour transitions (the header links) on **9 of 9** pages. It is now a global rule (`app/[locale]/globals.css`) plus Motion's `reducedMotion="user"`. Separately, the hero entrance is a CSS animation and the scroll reveals are un-hidden with JavaScript off (`@media (scripting: none)`): before, the hero heading was invisible until hydration and permanently invisible without JavaScript.
+- **Lighthouse** (3 runs per configuration, deployed site, ranges across runs): three runs per configuration against the deployed site, on a modest laptop (Lighthouse's CPU benchmark scored 506 to 1178 across runs, below the ~1000 it expects for its reference device, so mobile TBT and LCP are pessimistic and noisy). Accessibility, Best Practices and SEO were **100 in every run**.
+
+| Page | Form | Performance | LCP | TBT | CLS |
+| --- | --- | --- | --- | --- | --- |
+| Homepage `/en` | desktop | 87-97 | 1.1-1.5 s | 89-239 ms | 0 |
+| Homepage `/en` | mobile | 54-72 | 5.1-5.2 s | 297-1113 ms | 0 |
+| Blog post (en) | desktop | 88-97 | 1.3-1.7 s | 17-74 ms | 0 |
+| Blog post (en) | mobile | 66-70 | 4.4-5.1 s | 518-646 ms | 0 |
+| Arabic homepage `/ar` | desktop | 89-94 | 1.3-1.7 s | 8-133 ms | 0.003-0.004 |
+| Arabic homepage `/ar` | mobile | 39-72 | 5.9-8.0 s | 274-2426 ms | 0-0.001 |
+
+  Lighthouse found a real problem in the first set of runs (desktop 56-70, mobile 40-53): every public page downloaded the **whole Sanity Studio bundle** (about 1.9 MB gzip of JavaScript on the homepage) because the "Open the Studio" links were `next/link`s, which prefetch their target once in view. Links to `/studio` and `/api` are now plain anchors: homepage JavaScript dropped to about 0.2 MB gzip (a 9x cut) and total page weight to about 0.7 MB. Mobile is still the weak spot: the hero image is the LCP under simulated slow 4G, and hydration is the main-thread cost. Next steps, if wanted: `fetchpriority="high"` and a smaller hero image variant, and `LazyMotion` to trim the animation library.
 
 ## Known limitations
 
