@@ -114,7 +114,7 @@ export function BlogBrowser({ posts, initial }: { posts: PostSummary[]; initial:
                     onClick={(event) => onLinkClick(event, { ...query, tag, page: 1 })}
                   >
                     {tag}
-                    <span className="ms-1.5 text-ink-soft">{format.number(count)}</span>
+                    <span className="ms-1.5 text-ink-soft">{format.number(count, { numberingSystem: "latn" })}</span>
                   </TagLink>
                 </li>
               ))}
@@ -187,7 +187,7 @@ export function BlogBrowser({ posts, initial }: { posts: PostSummary[]; initial:
                     n === page ? "font-semibold text-ink underline decoration-1 underline-offset-[6px]" : "text-ink-soft hover:text-proof"
                   }`}
                 >
-                  {format.number(n)}
+                  {format.number(n, { numberingSystem: "latn" })}
                 </a>
               </li>
             ))}

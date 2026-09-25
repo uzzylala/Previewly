@@ -22,7 +22,9 @@ export default getRequestConfig(async () => {
     // One fixed zone so server and client format the same instant identically.
     timeZone: "UTC",
     formats: {
-      dateTime: { long: { year: "numeric", month: "long", day: "numeric" } },
+      // Latin digits in every locale, Arabic included ("24 سبتمبر 2026"): pinned rather than
+      // left to each runtime's ICU default, so dates never change script between environments.
+      dateTime: { long: { year: "numeric", month: "long", day: "numeric", numberingSystem: "latn" } },
     },
   };
 });
