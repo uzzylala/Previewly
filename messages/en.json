@@ -43,9 +43,11 @@
     "close": "”"
   },
   "NotFound": {
-    "title": "Page not found",
-    "body": "This page doesn't exist, or it hasn't been published yet.",
-    "home": "Back to the homepage"
+    "eyebrow": "Error 404",
+    "title": "That page isn't <em>on the proof</em>.",
+    "body": "It may have moved, it may never have been published, or the link may have a typo.",
+    "home": "Back to the homepage",
+    "blog": "Read the blog"
   },
   "Blog": {
     "eyebrow": "Blog",
@@ -68,5 +70,13 @@
     "published": "Published",
     "back": "All posts",
     "pageOf": "Page {page} of {total}"
+  },
+  "Error": {
+    "eyebrow": "Error",
+    "title": "Something went <em>wrong</em>.",
+    "body": "The page failed to load, and it isn't you. Try again, or head back to the homepage.",
+    "retry": "Try again",
+    "home": "Back to the homepage",
+    "reference": "Reference: {digest}"
   }
 }

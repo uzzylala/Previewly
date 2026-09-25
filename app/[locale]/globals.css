@@ -186,6 +186,22 @@
 }
 
 /*
+ * Reduced motion: every animation and transition on the site, including the blog, is cut
+ * to nothing. The scroll reveals are pinned at their resting state separately (above), and
+ * Motion's own animations honour MotionConfig reducedMotion="user".
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/*
  * Arabic typography. Unlayered on purpose, so these beat the tracking and leading
  * utilities the Latin design uses.
  *

@@ -16,7 +16,11 @@ const ALREADY_LOCALIZED = new RegExp(`^/(?:${locales.join("|")})(?:[/?#]|$)`);
 type Props = { href: string; className?: string; children: ReactNode };
 
 export function SiteLink({ href, ...props }: Props) {
-  if (href.startsWith("#") || NOT_LOCALIZED.test(href) || ALREADY_LOCALIZED.test(href)) {
+  // The Studio is a separate app (its own root layout, several MB of JavaScript). A next/link
+  // to it would prefetch that whole bundle as soon as the link scrolls into view, on every
+  // public page, so it (and the API) get a plain anchor: a real navigation, no prefetch.
+  if (NOT_LOCALIZED.test(href)) return <a href={href} {...props} />;
+  if (href.startsWith("#") || ALREADY_LOCALIZED.test(href)) {
     return <NextLink href={href} {...props} />;
   }
   return <Link href={href} {...props} />;

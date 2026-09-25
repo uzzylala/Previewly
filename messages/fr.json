@@ -43,9 +43,11 @@
     "close": " »"
   },
   "NotFound": {
-    "title": "Page introuvable",
-    "body": "Cette page n'existe pas, ou elle n'a pas encore été publiée.",
-    "home": "Retour à l'accueil"
+    "eyebrow": "Erreur 404",
+    "title": "Cette page n'est pas <em>sur l'épreuve</em>.",
+    "body": "Elle a peut-être été déplacée, n'a jamais été publiée, ou le lien contient une faute de frappe.",
+    "home": "Retour à l'accueil",
+    "blog": "Lire le blog"
   },
   "Blog": {
     "eyebrow": "Blog",
@@ -68,5 +70,13 @@
     "published": "Publié le",
     "back": "Tous les articles",
     "pageOf": "Page {page} sur {total}"
+  },
+  "Error": {
+    "eyebrow": "Erreur",
+    "title": "Une erreur <em>s'est produite</em>.",
+    "body": "La page n'a pas pu se charger, et ce n'est pas votre faute. Réessayez, ou retournez à l'accueil.",
+    "retry": "Réessayer",
+    "home": "Retour à l'accueil",
+    "reference": "Référence : {digest}"
   }
 }
