@@ -16,20 +16,34 @@ import "./globals.css";
 // file that keeps the optical-size axis (the high-contrast cut at display sizes). The Google
 // loader only honours `axes` for the full 200-800 weight range, which is 272 KB for the pair
 // against 120 KB here. Latin subset, downloaded from Google Fonts (SIL Open Font License).
+//
+// The italics are separate families with preload off: the upright faces are what the hero
+// needs to paint, and every preloaded byte competes with the LCP image (and is wasted on the
+// Arabic pages, which have no italics). The italic files load when an italic glyph is drawn.
 const newsreader = localFont({
   variable: "--font-newsreader",
-  src: [
-    { path: "../fonts/newsreader-normal.woff2", weight: "400", style: "normal" },
-    { path: "../fonts/newsreader-italic.woff2", weight: "400", style: "italic" },
-  ],
+  src: [{ path: "../fonts/newsreader-normal.woff2", weight: "400", style: "normal" }],
   display: "swap",
 });
 
-// Italic is loaded so body-copy <em> gets a true italic rather than a synthesised slant
+const newsreaderItalic = localFont({
+  variable: "--font-newsreader-italic",
+  src: [{ path: "../fonts/newsreader-italic.woff2", weight: "400", style: "italic" }],
+  display: "swap",
+  preload: false,
+});
+
 const instrumentSans = Instrument_Sans({
   variable: "--font-instrument-sans",
   subsets: ["latin"],
-  style: ["normal", "italic"],
+});
+
+// Body-copy <em> gets a true italic rather than a synthesised slant; not preloaded (see above).
+const instrumentSansItalic = Instrument_Sans({
+  variable: "--font-instrument-sans-italic",
+  subsets: ["latin"],
+  style: "italic",
+  preload: false,
 });
 
 // The approved Arabic pairing: Noto Naskh Arabic for display type (the counterpart of the
@@ -74,7 +88,7 @@ export default async function LocaleLayout({ children }: LayoutProps<"/[locale]"
     <html
       lang={locale}
       dir={localeMeta[locale].dir}
-      className={`${newsreader.variable} ${instrumentSans.variable} ${notoNaskhArabic.variable} ${ibmPlexSansArabic.variable}`}
+      className={`${newsreader.variable} ${newsreaderItalic.variable} ${instrumentSans.variable} ${instrumentSansItalic.variable} ${notoNaskhArabic.variable} ${ibmPlexSansArabic.variable}`}
     >
       <body className="flex min-h-dvh flex-col">
         <NextIntlClientProvider>

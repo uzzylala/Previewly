@@ -22,6 +22,9 @@
   --font-*: initial;
   --font-display: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
   --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  /* The italics are separate families (not preloaded); see app/[locale]/layout.tsx */
+  --font-display-italic: var(--font-newsreader-italic), "Iowan Old Style", Georgia, serif;
+  --font-sans-italic: var(--font-instrument-sans-italic), ui-sans-serif, system-ui, sans-serif;
   /* Arabic pairing from the approved direction: Naskh for display, Plex Sans Arabic for text */
   --font-display-arabic: var(--font-noto-naskh-arabic), "Noto Naskh Arabic", "Traditional Arabic", serif;
   --font-sans-arabic: var(--font-ibm-plex-sans-arabic), "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
@@ -92,11 +95,15 @@
   :lang(ar) {
     --font-display: var(--font-display-arabic);
     --font-sans: var(--font-sans-arabic);
+    --font-display-italic: var(--font-display-arabic);
+    --font-sans-italic: var(--font-sans-arabic);
   }
   :lang(en),
   :lang(fr) {
     --font-display: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
     --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+    --font-display-italic: var(--font-newsreader-italic), "Iowan Old Style", Georgia, serif;
+    --font-sans-italic: var(--font-instrument-sans-italic), ui-sans-serif, system-ui, sans-serif;
   }
   [lang] {
     font-family: var(--font-sans);
@@ -143,7 +150,16 @@
  */
 @utility display-emphasis {
   font-style: italic;
+  font-family: var(--font-display-italic);
   color: var(--color-proof);
+}
+
+/* Italic body copy uses its own (lazily loaded) family; inside a serif blockquote, the serif italic. */
+.italic {
+  font-family: var(--font-sans-italic);
+}
+blockquote .italic {
+  font-family: var(--font-display-italic);
 }
 
 /* Hero entrance (components/ui/stagger.tsx): CSS-only so it needs no JavaScript to start. */
@@ -271,4 +287,5 @@
 [lang="en"] > em.display-emphasis {
   font-style: italic;
   font-weight: 400;
+  font-family: var(--font-newsreader-italic), "Iowan Old Style", Georgia, serif;
 }
