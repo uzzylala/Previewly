@@ -20,6 +20,9 @@ import { cacheTags } from "@/sanity/lib/tags";
  *     "translationIds": coalesce(after().translations[].value._ref, []) + coalesce(before().translations[].value._ref, [])
  *   }
  *
+ * The webhook must use API version v2025-02-19 or later: on the default v2021-03-25 the
+ * projection is silently ignored and the raw document is delivered instead.
+ *
  * The before/after pair lets a renamed, moved or deleted page's old URL drop out of the
  * cache too.
  */
@@ -42,7 +45,9 @@ type Version = { type?: string | null; language: string | null; slug: string | n
  * A post also refreshes its language's blog index, which lists it.
  */
 function tagVersion(tags: Set<string>, kind: string, { language, slug }: Version) {
-  if (!slug || !language || !isLocale(language)) return;
+  // typeof: a webhook without the documented projection delivers the raw document, whose
+  // slug is an object; ignore it rather than tag "[object Object]".
+  if (typeof slug !== "string" || !slug || !language || !isLocale(language)) return;
   if (kind === "post") {
     tags.add(cacheTags.post(language, slug));
     tags.add(cacheTags.posts(language));
