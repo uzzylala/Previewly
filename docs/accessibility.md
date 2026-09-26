@@ -20,7 +20,7 @@ I tried to run a portable NVDA 2026.2 with a silent synthesiser and read what it
 
 | | Before | After |
 | --- | --- | --- |
-| axe violations, 33 audits | 15 nodes, 4 rules | **0** |
+| axe violations, 33 audits | 15 nodes, 4 rules | **0** (re-run after the Part C font and weight changes: still 0) |
 | Skip link | none | first Tab stop, "Skip to content", translated, targets `<main id="content">` |
 | Pagination announced | no: the live region only changed when the result *count* changed | yes: "7 posts · Page 2 of 2" |
 | Focus ring on dark grounds (CTA band, draft bar) | proof blue on ink, about 2.1:1 | paper on ink |
