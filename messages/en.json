@@ -4,7 +4,8 @@
     "homeLabel": "Previewly home",
     "tagline": "Draft it. Proof it. Publish it.",
     "primaryNav": "Primary",
-    "skipToContent": "Skip to content"
+    "skipToContent": "Skip to content",
+    "sourceOnGithub": "Source on GitHub"
   },
   "Nav": {
     "howItWorks": "How it works",

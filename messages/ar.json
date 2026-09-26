@@ -4,7 +4,8 @@
     "homeLabel": "الصفحة الرئيسية لـ Previewly",
     "tagline": "اكتبها. راجعها. انشرها.",
     "primaryNav": "الرئيسية",
-    "skipToContent": "انتقل إلى المحتوى"
+    "skipToContent": "انتقل إلى المحتوى",
+    "sourceOnGithub": "الشيفرة المصدرية على GitHub"
   },
   "Nav": {
     "howItWorks": "كيف تعمل",

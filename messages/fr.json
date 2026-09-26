@@ -4,7 +4,8 @@
     "homeLabel": "Accueil Previewly",
     "tagline": "Rédigez. Relisez. Publiez.",
     "primaryNav": "Principale",
-    "skipToContent": "Aller au contenu"
+    "skipToContent": "Aller au contenu",
+    "sourceOnGithub": "Code source sur GitHub"
   },
   "Nav": {
     "howItWorks": "Comment ça marche",
